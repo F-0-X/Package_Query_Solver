@@ -1,0 +1,22 @@
+{
+   "table":"table name",
+   "max":true,
+   "A0": "None",
+   "Lc": "None",
+   "Uc": "None",
+   "A": [
+     "field1",
+     "field2",
+     "field3"
+   ],
+   "L":[
+      1,
+      3,
+      4
+   ],
+   "U":[
+      4,
+      9,
+      8
+   ]
+}

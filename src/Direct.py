@@ -1,6 +1,6 @@
 from utils import *
 
-def direct(args):
+def direct(data):
     print('direct worker is working')
     # TODO transform the argument to something that ILP solver can understand (might move to util later)
 
