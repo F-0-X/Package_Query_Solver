@@ -1,5 +1,5 @@
 {
-   "table":"tpch",
+   "table":"tpch10",
    "max": false,
    "A0": "ps_min_supplycost",
    "Lc": "1",
