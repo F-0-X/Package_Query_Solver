@@ -28,7 +28,7 @@ if __name__ == '__main__':
                         help="Advance mode - Use SketchRefine instead of Direct")
 
     # argument for default read in data file address
-    parser.add_argument("--input_dir", default="input/", type=str, help="folder for input json file")
+    parser.add_argument("--input_dir", default="./input/", type=str, help="folder for input json file")
     # argument for default input(json file) address
     parser.add_argument("--input_file", default="Q2.json", type=str, help="input file name")
 
