@@ -58,8 +58,6 @@ def direct(query, data_dir):
     print("Status:", pulp.LpStatus[prob.status])
     for v in prob.variables():
         print(v.name, "=", v.varValue)
-    # TODO transform the argument to something that ILP solver can understand (might move to util later)
-    # TODO use the PuLP to solve the ILP problem considering the database
 
 
 def var_generator(num):
