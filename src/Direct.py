@@ -1,8 +1,8 @@
+
 from utils import *
 import pulp
 import pandas as pd
 import numpy as np
-
 
 def direct(query, data_dir):
     table_name = query["table"]
@@ -14,6 +14,7 @@ def direct(query, data_dir):
     Table = pd.read_csv(path_to_dataset, sep=',')
 
     # defind min or max problem
+
     prob = pulp.LpProblem("Package_Query_Maximize", pulp.LpMaximize)
     if query["max"] is False:
         prob = pulp.LpProblem("Package_Query_Minimize", pulp.LpMinimize)
@@ -28,6 +29,7 @@ def direct(query, data_dir):
     else:
         A_zero_col = Table[[A_zero]].to_numpy().reshape(-1)
         prob += pulp.lpSum(np.dot(A_zero_col, vars))
+
 
     # Lc and Uc constrains
     lower_count = query["Lc"]
@@ -56,8 +58,6 @@ def direct(query, data_dir):
     print("Status:", pulp.LpStatus[prob.status])
     for v in prob.variables():
         print(v.name, "=", v.varValue)
-    # TODO transform the argument to something that ILP solver can understand (might move to util later)
-    # TODO use the PuLP to solve the ILP problem considering the database
 
 
 def var_generator(num):

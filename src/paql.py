@@ -3,6 +3,7 @@ import os
 
 from Direct import *
 from utils import *
+from partition import *
 
 
 def main(args):
@@ -13,6 +14,8 @@ def main(args):
 
     if args.advance:
         print('SketchRefine Mode')
+
+        partition(args.size_threshold, args.diameter_bound, "tpch", args.data_dir, args.temp_dir)
         # TODO add code for SketchRefine here
     else:
         print('Direct Mode')
@@ -34,8 +37,16 @@ if __name__ == '__main__':
 
     # TODO add argument for default output directory and file name
 
-    # TODO add argument for default database folder
+    # add argument for default dataset folder
     parser.add_argument("--data_dir", default="data/", type=str, help="folder storing datasets")
+    parser.add_argument("--temp_dir", default="temp/", type=str,
+                        help="folder storing temp datasets like partitions or sketch result")
+
+    # add argument for partition size threshold and diameter bound
+    parser.add_argument("--size_threshold", default=100, type=int,
+                        help="the size threshold, geq 1 and leq n, restricts the size of each partition group")
+    parser.add_argument("--diameter_bound", default=10, type=float,
+                        help="the size threshold, geq 1 and leq n, restricts the size of each partition group")
 
     # print(parser.parse_args())
     main(parser.parse_args())
