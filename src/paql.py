@@ -2,9 +2,9 @@ import argparse
 import os
 
 from Direct import *
+from src.SketchRefine import SketchRefine
 from utils import *
 from partition import *
-
 
 def main(args):
     print(args)
@@ -14,12 +14,14 @@ def main(args):
 
     if args.advance:
         print('SketchRefine Mode')
-
+        # TODO we need to call this function for all large csv in the data folder(and don't delete if forever)
+        # TODO we need to skip making partition if we already do the partition
         partition(args.size_threshold, args.diameter_bound, "tpch", args.data_dir, args.temp_dir)
-        # TODO add code for SketchRefine here
+
+        worker = SketchRefine()
+        worker.sketch_and_refine() # TODO add parameter here
     else:
         print('Direct Mode')
-        # TODO add code for Direct here
         direct(query, args.data_dir)
 
 
