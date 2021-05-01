@@ -11,3 +11,5 @@ def processInputFile(path_to_input_file):
     if len(data['A']) != len(data['L']) or len(data['A']) != len(data['U']):
         raise Exception('invalid input file')
     return data
+
+# TODO a helper function which can help us generate the name of partition file
