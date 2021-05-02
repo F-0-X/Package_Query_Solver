@@ -12,3 +12,4 @@ def processInputFile(path_to_input_file):
         raise Exception('invalid input file')
     return data
 
+# TODO a helper function which can help us generate the name of partition file

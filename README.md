@@ -15,3 +15,4 @@
 ## Instruction
 1. Download the tpch.csv and put it in the data/ folder
 2. remember to set the working directory to 645_project instead of 645_project/src
+3. remember to edit the template for unittest and set the working directory to 645_project
