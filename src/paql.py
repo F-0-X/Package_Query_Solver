@@ -11,6 +11,7 @@ def main(args):
     # TODO parse the args into variables
     path_to_input_file = os.path.join(args.input_dir, args.input_file)
     query = processInputFile(path_to_input_file)
+    load_write_helper = LoadAndWrite(args)
 
     if args.advance:
         print('SketchRefine Mode')
@@ -20,7 +21,7 @@ def main(args):
         partition(partition_core, "tpch", args.data_dir, args.temp_dir)
 
         worker = SketchRefine()
-        worker.sketch_and_refine() # TODO add parameter here
+        worker.sketch_and_refine(query, load_write_helper) # TODO add parameter here
     else:
         print('Direct Mode')
         direct(query, args.data_dir)

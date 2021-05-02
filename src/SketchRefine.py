@@ -1,14 +1,18 @@
+from src.utils import OptimizeObjective
 
 
 class SketchRefine:
 
-    def sketch(self):
-        # TODO we firstly build a representation table, where each tuple represent a groups
+    def sketch(self, query, load_write_helper):
+        #  we firstly build a representation table, where each tuple represent a groups
         #  To ensure approximation guarantees (Section 5.1),
         #  the maximum (minimum, resp.) value is chosen for a maximization (minimization, resp.) query.
         #  For all other attributes, the algorithm picks the average value.
-
-        # we probably store the representation table in memory as a class variable
+        table_name = query["table"]
+        objective = OptimizeObjective.MAXIMIZE
+        if not query['max']:
+            objective = OptimizeObjective.MAXIMIZE
+        rep_df = load_write_helper.getReprecentation(table_name, objective)
 
         # TODO secondly, we want to use Direct to solve the query with the representation table as input
         #  (We need to add some new global constraints to ensure that every representative tuple
@@ -21,8 +25,8 @@ class SketchRefine:
         # TODO follow the Pseudocode in the paper
         a = 1
 
-    def sketch_and_refine(self):
+    def sketch_and_refine(self, query, load_write_helper):
         # TODO take all input, call sketch, update class variable
         #  call refine and return the result package
 
-        self.sketch()
+        self.sketch(query, load_write_helper)
