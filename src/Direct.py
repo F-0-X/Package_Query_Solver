@@ -3,6 +3,7 @@ import pulp
 import pandas as pd
 import numpy as np
 
+
 def direct(query, data_dir):
     table_name = query["table"]
     path_to_dataset = data_dir + table_name + '.csv'
@@ -13,22 +14,25 @@ def direct(query, data_dir):
     Table = pd.read_csv(path_to_dataset, sep=',')
 
     # defind min or max problem
-
-    prob = pulp.LpProblem("Package_Query_Maximize", pulp.LpMaximize)
     if query["max"] is False:
         prob = pulp.LpProblem("Package_Query_Minimize", pulp.LpMinimize)
+    else:
+        prob = pulp.LpProblem("Package_Query_Maximize", pulp.LpMaximize)
 
     # generate variables and add objective function
     A_zero = query["A0"]
-    vars = np.arange(1, len(Table) + 1)
-    vars_vector = np.vectorize(var_generator)
-    vars = vars_vector(vars)
+    vars = Table[["id"]].to_numpy().reshape(-1)
+    vars_dic = pulp.LpVariable.dicts("x", vars, cat='Binary')
+
+    # vars_vector = np.vectorize(var_generator)
+    # vars = vars_vector(vars)
+    vars = np.array(list(vars_dic.values()))
+
     if A_zero == "None":
         prob += pulp.lpSum(vars)
     else:
         A_zero_col = Table[[A_zero]].to_numpy().reshape(-1)
-        prob += pulp.lpSum(np.dot(A_zero_col, vars))
-
+        prob += pulp.lpSum(A_zero_col * vars)
 
     # Lc and Uc constrains
     lower_count = query["Lc"]
@@ -44,7 +48,7 @@ def direct(query, data_dir):
         cons_var = vars
         if constrains != 'None':
             cons_col = Table[[constrains]].to_numpy().reshape(-1)
-            cons_var = np.dot(cons_col, vars)
+            cons_var = (cons_col * vars)
         lower_bound = query["L"][i]
         if lower_bound != 'None':
             prob += pulp.lpSum(cons_var) >= lower_bound
@@ -52,11 +56,30 @@ def direct(query, data_dir):
         if upper_bound != 'None':
             prob += pulp.lpSum(cons_var) <= upper_bound
 
+    sketch = False
+    # sketch = True
+    gid = 2  # or number of clusters
+    if sketch:
+        for index in range(gid + 1):
+            gID = Table.loc[Table['gid'] == index]
+            idx = gID[["id"]].to_numpy().reshape(-1)
+            vars_name = ['x_' + str(i) for i in idx]
+            var = [vars_dic[vname] for vname in vars_name]
+            var = np.array(var)
+            prob += pulp.lpSum(var) <= len(idx)
 
     prob.solve()
     print("Status:", pulp.LpStatus[prob.status])
     for v in prob.variables():
         print(v.name, "=", v.varValue)
+
+    if prob.status:
+        result = []
+        for v in prob.variables():
+            result.append([v.name, v.varValue])
+        return result
+    else:
+        return None
 
 
 def var_generator(num):
