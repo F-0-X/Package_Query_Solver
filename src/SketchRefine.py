@@ -8,7 +8,6 @@ import random
 class SketchRefine:
 
     def __init__(self):
-        #
         # updated by sketch and used by refine
         self.P = None
 
@@ -50,7 +49,7 @@ class SketchRefine:
         # TODO we finally return ps, which is a dataframe looks like this
         """
             +---------------+--------+-------------+-------+
-            |original fields|group_id|sketch_result|refined|
+            |original fields|group_id| num_of_tuple|refined|
             +---------------+--------+-------------+-------+
             |               |   1    |      3      | False |
             +---------------+--------+-------------+-------+
@@ -65,7 +64,7 @@ class SketchRefine:
         
         """
 
-        a = 1
+        return 1
 
     # Note that this is a recursive function, and it relay on some class variable
     # Q is the package query to evaluate
@@ -133,9 +132,22 @@ class SketchRefine:
 
         def q(target, ps):
             if query['A0'] != 'None':
+                all_count = ps[query['A0']].sum()
+                others_count = all_count - target.get_num_of_tuple()
+                if query['Lc'] != 'None':
+                    query['Lc'] -= others_count
+                if query['Uc'] != 'None':
+                    query['Uc'] -= others_count
 
-                ps[]
+            for i, Ai in enumerate(query['A']):
+                all_sum = int((ps[Ai] * ps['num_of_tuple']).sum())
+                others_sum = all_sum - int(target.get_representation_tuple()[Ai][1]) * target.get_num_of_tuple()
+                if query['L'][i] != 'None':
+                    query['L'][i] -= others_sum
+                if query['U'][i] != 'None':
+                    query['U'][i] -= others_sum
 
+            return query, target.get_group_df()
 
-
-        self.sketch(query, load_write_helper)
+        sketch_result = self.sketch(query, load_write_helper)
+        return self.refine(q, self.P.copy(), sketch_result)

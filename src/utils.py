@@ -76,6 +76,7 @@ class GroupAndRepresentationTuple:
         self.group_id = group_id
         self.representation_tuple = representation_tuple
         self.num_of_tuple = num_of_tuple
+        self.representation_tuple.reset_index(drop=True)
 
     def __eq__(self, other):
         return self.group_id == other.group_id
