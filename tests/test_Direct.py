@@ -14,9 +14,9 @@ class TestDirect(TestCase):
         direct(query, path_to_dataset)
 
     def testDirect(queries=[2]):
-        path_to_dataset = "../data/"
+        path_to_dataset = "data/"
 
-        path_to_input_file = "../input/Q2.json"
+        path_to_input_file = "input/Q2.json"
         query = processInputFile(path_to_input_file)
 
         dataset_size_list = [str(int(i * 10)) + '.0%' for i in range(1, 11)]
@@ -25,7 +25,7 @@ class TestDirect(TestCase):
         # for each query
         for q in queries:
             time_list = []
-            path_to_input_file = '../input/Q' + str(q) + '.json'
+            path_to_input_file = 'input/Q' + str(q) + '.json'
             query = processInputFile(path_to_input_file)
             # for each dataset size
             for size in range(len(dataset_size_list)):
@@ -40,7 +40,7 @@ class TestDirect(TestCase):
                 print('Time taken for Q', q, ' with size ', dataset_size_list[size], ': ', time_taken)
                 time_list.append(time_taken)
             # write the time taken for running current query with different dataset size to a file
-            file_name = '../output/' + 'Time_List_Direct_Q' + str(q + 1) + '.txt'
+            file_name = 'output/' + 'Time_List_Direct_Q' + str(q + 1) + '.txt'
             with open(file_name, 'w') as f:
                 for item in time_list:
                     f.write("%s\n" % item)

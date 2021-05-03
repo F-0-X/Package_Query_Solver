@@ -18,7 +18,7 @@ def setQueryTableName(query, table_name='tpch'):
     query['table'] = table_name
     return query
 
-def splitDataset(size=[0.1, 0.4, 0.7], path_to_input_file='../data/tpch.csv', randomSample=False):
+def splitDataset(size=[0.1, 0.4, 0.7], path_to_input_file='data/tpch.csv', randomSample=False):
     if not os.path.isfile(path_to_input_file):
         raise Exception("input file is not a file")
 
@@ -28,7 +28,7 @@ def splitDataset(size=[0.1, 0.4, 0.7], path_to_input_file='../data/tpch.csv', ra
     row_cnt = len(dataset.index)  # 6001215 header not included
 
     for percent in size:
-        file_path_name = '../data/tpch_' + str(percent * 100) + '%'
+        file_path_name = 'data/tpch_' + str(percent * 100) + '%'
         if randomSample:
             file_path_name += '_rand.csv'
             dataset_part = dataset.sample(frac=percent, random_state=200)
@@ -45,7 +45,7 @@ def plotDirectVsSketchRefine(dataset_size, direct_time_taken, sketchRefine_time_
     plt.xlabel('Dataset size')
     plt.ylabel('Time')
     plt.legend(['Direct', 'SketchRefine'])
-    plt.savefig('../output/direct_vs_sketchRefine.png')
+    plt.savefig('output/direct_vs_sketchRefine.png')
     # plt.show()
 
 def plotDirect(dataset_size, direct_time_taken, query_name, x_label, y_label):
@@ -55,7 +55,7 @@ def plotDirect(dataset_size, direct_time_taken, query_name, x_label, y_label):
     plt.xlabel('Dataset size')
     plt.ylabel('Time')
     plt.legend(['Direct'])
-    plt.savefig('../output/direct_' + query_name + '.png')
+    plt.savefig('output/direct_' + query_name + '.png')
 
 
 # TODO a helper function which can help us generate the name of partition file
