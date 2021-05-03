@@ -1,6 +1,14 @@
 import json
 import os
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
 from enum import Enum
+from heapq import heappush, heappop
+from queue import Queue
+import numpy as np
+import pandas as pd
 
 
 def processInputFile(path_to_input_file):
@@ -14,10 +22,58 @@ def processInputFile(path_to_input_file):
         raise Exception('invalid input file')
     return data
 
+
+
+def setQueryTableName(query, table_name='tpch'):
+    query['table'] = table_name
+    return query
+
+def splitDataset(size=[0.1, 0.4, 0.7], path_to_input_file='data/tpch.csv', randomSample=False):
+    if not os.path.isfile(path_to_input_file):
+        raise Exception("input file is not a file")
+
+    # read dataset as dataframe
+    dataset = pd.read_csv(path_to_input_file)
+    # total number of rows in the dataset, or dataset.shape[0]
+    row_cnt = len(dataset.index)  # 6001215 header not included
+
+    for percent in size:
+        file_path_name = 'data/tpch_' + str(percent * 100) + '%'
+        if randomSample:
+            file_path_name += '_rand.csv'
+            dataset_part = dataset.sample(frac=percent, random_state=200)
+        else:
+            file_path_name += '.csv'
+            dataset_part = dataset.iloc[:int(percent * row_cnt), :]  # percent% of the dataset
+        # convert to csv
+        dataset_part.to_csv(file_path_name, index=False)
+
+def plotDirectVsSketchRefine(dataset_size, direct_time_taken, sketchRefine_time_taken, query_name, x_label, y_label):
+    plt.plot(dataset_size, direct_time_taken)
+    plt.plot(dataset_size, sketchRefine_time_taken)
+    plt.title(query_name)
+    plt.xlabel('Dataset size')
+    plt.ylabel('Time')
+    plt.legend(['Direct', 'SketchRefine'])
+    plt.savefig('output/direct_vs_sketchRefine.png')
+    # plt.show()
+
+def plotDirect(dataset_size, direct_time_taken, query_name, x_label, y_label):
+    dataset_size = [x / 10 for x in range(1, 11)]
+    plt.plot(dataset_size, direct_time_taken)
+    plt.title(query_name)
+    plt.xlabel('Dataset size')
+    plt.ylabel('Time')
+    plt.legend(['Direct'])
+    plt.savefig('output/direct_' + query_name + '.png')
+
+
+
 class OptimizeObjective(Enum):
     MAXIMIZE = 1
     MINIMIZE = 2
     AVERAGE = 3
+
 
 class LoadAndWrite:
 
@@ -25,8 +81,7 @@ class LoadAndWrite:
         self.partition_dir = args.temp_dir
 
     # This method is used by sketch to get the representation table
-    def getReprecentation(table_name, objective = OptimizeObjective.MAXIMIZE):
-
+    def getReprecentation(table_name, objective=OptimizeObjective.MAXIMIZE):
         # TODO get path to file by table name and self.partition_dir
 
         # TODO read in corresponding csv
@@ -34,6 +89,85 @@ class LoadAndWrite:
         # TODO filter the df to get the representation table and return it
         a = 1
 
-# TODO a helper function which can help us generate the name of partition file
+    # TODO a helper function which can help us generate the name of partition file
+
+
+class SimplePQ:
+
+    # failed_groups is a set
+    # high_pq and low_pq are queue.Queue
+    def __init__(self, failed_groups, high_pq, low_pq):
+        self.failed_groups = failed_groups
+        self.high_pq = high_pq
+        self.low_pq = low_pq
+
+    def prioritize(self, new_failed_groups):
+        for group in new_failed_groups:
+            if group not in self.failed_groups:
+                self.failed_groups.add(group)
+                self.high_pq.put(group)
+
+    def pop(self):
+
+        if not self.high_pq.empty():
+            return self.high_pq.get()
+        else:
+            while not self.low_pq.empty():
+                candidate = self.low_pq.get()
+                if candidate not in self.failed_groups:
+                    return candidate
+        return None
+
+
+class GroupAndRepresentationTuple:
+
+    def __init__(self, group_id, group_df=None, representation_tuple=None, num_of_tuple=1):
+        self.group_df = group_df
+        self.group_id = group_id
+        self.representation_tuple = representation_tuple
+        self.num_of_tuple = num_of_tuple
+        self.representation_tuple.reset_index(drop=True)
+
+    def __eq__(self, other):
+        return self.group_id == other.group_id
+
+    def __ne__(self, other):
+        return self.group_id != other.group_id
+
+    def __lt__(self, other):
+        return self.group_id < other.group_id
+
+    def __le__(self, other):
+        return self.group_id <= other.group_id
+
+    def __gt__(self, other):
+        return self.group_id > other.group_id
+
+    def __ge__(self, other):
+        return self.group_id >= other.group_id
+
+    def __str__(self):
+        return str(self.group_id)
+
+    def __hash__(self):
+        return hash(self.group_id)
+
+    def __repr__(self):
+        return str(self.group_id)
+
+    def get_group_df(self):
+        return self.df
+
+    def get_representation_tuple(self):
+        return self.representation_tuple
+
+    def get_titles(self):
+        return self.df.columns
+
+    def get_group_id(self):
+        return self.group_id
+
+    def get_num_of_tuple(self):
+        return self.num_of_tuple
 
 

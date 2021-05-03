@@ -1,0 +1,16 @@
+{
+   "table":"tpch10",
+   "max": false,
+   "A0": "None",
+   "Lc": "1",
+   "Uc": "None",
+   "A": [
+     "o_totalprice", "o_shippriority"
+   ],
+   "L":[
+      "None", 3
+   ],
+   "U":[
+      453998.242103, "None"
+   ]
+}
