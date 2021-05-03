@@ -22,6 +22,8 @@ def Kmeans_part(table_name, n_cluster, data_folder_path, temp_folder_path):
     represent = []
     for i in range(n_cluster):
         df = dataframe_cluster.loc[dataframe_cluster['gid'] == i]
+        file_path = temp_folder_path + table_name + "_cluster_" + str(i) + ".csv"
+        df.to_csv(file_path, index=False)
         size = len(df)
         # calculate min, max, avg, and store each row of MIN, MAX in the representative csv file, the last row is MEAN
         df_np = df.to_numpy()
@@ -52,12 +54,12 @@ def Kmeans_part(table_name, n_cluster, data_folder_path, temp_folder_path):
 
 
 
-# from timeit import default_timer as timer
-#
-# start = timer()
-# a = Kmeans_part('tpch10', 2, 'data/', 'temp/')
-# end = timer()
-# print("time is ", end - start)
+from timeit import default_timer as timer
+
+start = timer()
+a = Kmeans_part('tpch10', 2, 'data/', 'temp/')
+end = timer()
+print("time is ", end - start)
 
 # Table = pd.read_csv('../data/tpch10.csv', sep=',')
 # record time for clustering
