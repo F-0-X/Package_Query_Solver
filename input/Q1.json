@@ -1,0 +1,16 @@
+{
+   "table":"tpch10",
+   "max": true,
+   "A0": "count_order",
+   "Lc": "1",
+   "Uc": "None",
+   "A": [
+     "sum_base_price", "sum_disc_price", "sum_charge", "avg_qty", "avg_price", "avg_disc", "sum_qty"
+   ],
+   "L":[
+      "None", "None", "None", "None", "None", "None", "None"
+   ],
+   "U":[
+      15469853.7043, 45279795.0584, 95250227.7918, 50.353948653, 68677.5852459, 0.110243522496, 77782.028739
+   ]
+}

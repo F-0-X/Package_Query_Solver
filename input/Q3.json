@@ -1,0 +1,16 @@
+{
+   "table":"tpch10",
+   "max": false,
+   "A0": "None",
+   "Lc": "1",
+   "Uc": "None",
+   "A": [
+     "revenue"
+   ],
+   "L":[
+      413930.849506
+   ],
+   "U":[
+      "None"
+   ]
+}

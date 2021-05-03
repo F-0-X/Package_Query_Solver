@@ -3,7 +3,7 @@ import os
 
 from Direct import *
 from src.SketchRefine import SketchRefine
-from utils import *
+from src.utils import *
 from partition import *
 
 def main(args):
