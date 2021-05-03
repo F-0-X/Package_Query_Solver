@@ -1,5 +1,6 @@
 from queue import Queue
 
+from src.Direct import direct
 from src.utils import OptimizeObjective, GroupAndRepresentationTuple, SimplePQ
 import random
 
@@ -26,9 +27,43 @@ class SketchRefine:
         #  (We need to add some new global constraints to ensure that every representative tuple
         #  does not appear in sketch result more times than the size of its group
 
+        """
+            representation table looks like this
+            +---------------+--------+
+            |original fields|group id|
+            +---------------+--------+
+            |               |   1    |
+            +---------------+--------+
+            |               |   2    |
+            +---------------+--------+
+            |               |   3    |
+            +---------------+--------+
+            |               |   4    |
+            +---------------+--------+
+            |               |   5    |
+            +---------------+--------+
+        
+        """
+
         # TODO we need to update the self.P, which is a set of utils.GroupAndRepresentationTuple
 
-        # TODO we finally return ps, which is a list of (we will have a new class for this)
+        # TODO we finally return ps, which is a dataframe looks like this
+        """
+            +---------------+--------+-------------+-------+
+            |original fields|group_id|sketch_result|refined|
+            +---------------+--------+-------------+-------+
+            |               |   1    |      3      | False |
+            +---------------+--------+-------------+-------+
+            |               |   2    |      0      | False |
+            +---------------+--------+-------------+-------+
+            |               |   3    |      2      | False |
+            +---------------+--------+-------------+-------+
+            |               |   4    |      1      | False |
+            +---------------+--------+-------------+-------+
+            |               |   5    |      5      | False |
+            +---------------+--------+-------------+-------+
+        
+        """
 
         a = 1
 
@@ -60,17 +95,47 @@ class SketchRefine:
             if curr_group is None:
                 # This means the priority queue is empty
                 break
-            if curr_group not in ps:
+            curr_group_id = curr_group.get_group_id()
+            curr_representation_tuple = ps[(ps['group_id'] == curr_group_id) & (ps['refined'] == False)]
+            if curr_representation_tuple.empty:
                 continue
 
+            pi = direct(Q(curr_group, ps))
 
+            if pi is not None:
+                ps_next = ps[(ps['group_id'] != curr_group_id) & (ps['refined'] == True)].copy()
+                ps_next = ps_next.append(pi)
+                S.remove(curr_group)
 
-        return (None, failed_groups)
+                p, failed_groups_new = self.refine(Q, S, ps_next)
+                S.add(curr_group)
+
+                if failed_groups_new is not None and not failed_groups_new.empty():
+                    # refine failure
+                    # greedily prioritize non-refinable groups
+                    pq.prioritize(failed_groups_new)  # This method also update failed_group
+                else:
+                    # refine success
+                    # why are we returning the failed_groups? we can just return a None
+                    return p, failed_groups
+
+            else:
+                if S != self.P:
+                    failed_groups.append(curr_group)
+                    return None, failed_groups
+
+        # TODO check failed_group == S
+        return None, failed_groups
 
     def sketch_and_refine(self, query, load_write_helper):
         # TODO take all input, call sketch, update class variable
         #  call refine and return the result package
 
+        def q(target, ps):
+            if query['A0'] != 'None':
+
+                ps[]
+
+
+
         self.sketch(query, load_write_helper)
-
-

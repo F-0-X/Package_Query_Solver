@@ -71,15 +71,64 @@ class SimplePQ:
 
 class GroupAndRepresentationTuple:
 
-    def __init__(self, df, representation_tuple):
-        self.df = df
+    def __init__(self, group_id, group_df=None, representation_tuple=None, num_of_tuple=1):
+        self.group_df = group_df
+        self.group_id = group_id
         self.representation_tuple = representation_tuple
+        self.num_of_tuple = num_of_tuple
 
-    def get_df(self) -> pd.Dataframe:
+    def __eq__(self, other):
+        return self.group_id == other.group_id
+
+    def __ne__(self, other):
+        return self.group_id != other.group_id
+
+    def __lt__(self, other):
+        return self.group_id < other.group_id
+
+    def __le__(self, other):
+        return self.group_id <= other.group_id
+
+    def __gt__(self, other):
+        return self.group_id > other.group_id
+
+    def __ge__(self, other):
+        return self.group_id >= other.group_id
+
+    def __str__(self):
+        return str(self.group_id)
+
+    def __hash__(self):
+        return hash(self.group_id)
+
+    def __repr__(self):
+        return str(self.group_id)
+
+    def get_group_df(self):
         return self.df
 
-    def get_representation_tuple(self) -> np.ndarray:
+    def get_representation_tuple(self):
         return self.representation_tuple
 
     def get_titles(self):
         return self.df.columns
+
+    def get_group_id(self):
+        return self.group_id
+
+    def get_num_of_tuple(self):
+        return self.num_of_tuple
+
+
+# class RefiningPackage:
+#
+#     def __init__(self, unrefined_representation_df):
+#         self.df1 = unrefined_representation_df
+#         df1_columns = list(unrefined_representation_df.columns)
+#         df2_columns = df1_columns[0:-2]
+#         self.df2 = pd.DataFrame(columns=df2_columns)
+#
+#     def df1_refine_switch(self, group_id):
+#         target_row = self.df1.loc[group_id-1, :]
+#         if int(target_row['group_id']) != group_id:
+#             target_row = self.df1[self.df1['group_id'] == group_id]
