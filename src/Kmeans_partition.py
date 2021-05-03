@@ -54,12 +54,12 @@ def Kmeans_part(table_name, n_cluster, data_folder_path, temp_folder_path):
 
 
 
-from timeit import default_timer as timer
-
-start = timer()
-a = Kmeans_part('tpch10', 2, 'data/', 'temp/')
-end = timer()
-print("time is ", end - start)
+# from timeit import default_timer as timer
+#
+# start = timer()
+# a = Kmeans_part('tpch10', 2, 'data/', 'temp/')
+# end = timer()
+# print("time is ", end - start)
 
 # Table = pd.read_csv('../data/tpch10.csv', sep=',')
 # record time for clustering
