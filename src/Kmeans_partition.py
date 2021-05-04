@@ -43,7 +43,8 @@ def Kmeans_part(table_name, n_cluster, data_folder_path, temp_folder_path):
         represent.append(mini)
         represent.append(maxi)
         represent.append(meanc)
-
+    represent = np.array(represent)
+    represent[:, 0] = np.arange(1, len(represent)+1)
     represent = np.array(represent)
     re_col = list(dataframe_cluster.columns)
     re_col.append("rpst")
@@ -54,12 +55,12 @@ def Kmeans_part(table_name, n_cluster, data_folder_path, temp_folder_path):
 
 
 
-# from timeit import default_timer as timer
-#
-# start = timer()
-# a = Kmeans_part('tpch10', 2, 'data/', 'temp/')
-# end = timer()
-# print("time is ", end - start)
+from timeit import default_timer as timer
+
+start = timer()
+a = Kmeans_part('tpch10', 2, 'data/', 'temp/')
+end = timer()
+print("time is ", end - start)
 
 # Table = pd.read_csv('../data/tpch10.csv', sep=',')
 # record time for clustering

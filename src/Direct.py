@@ -26,6 +26,12 @@ def direct(query, data_dir):
     vars = Table[["id"]].to_numpy().reshape(-1)
     vars_dic = pulp.LpVariable.dicts("x", vars, cat='Binary')
 
+    sketch = False
+    # sketch = True
+    gid = 2  # or number of clusters
+    if sketch:
+        vars_dic = pulp.LpVariable.dicts("x", vars, 0, None, cat=pulp.LpInteger)
+
     # vars_vector = np.vectorize(var_generator)
     # vars = vars_vector(vars)
     vars = np.array(list(vars_dic.values()))
@@ -64,23 +70,31 @@ def direct(query, data_dir):
         if upper_bound != 'None':
             prob += pulp.lpSum(cons_var) <= upper_bound
 
-    sketch = False
-    # sketch = True
-    gid = 2  # or number of clusters
+
     if sketch:
-        for index in range(gid + 1):
+        for index in range(gid):
             gID = Table.loc[Table['gid'] == index]
             idx = gID[["id"]].to_numpy().reshape(-1)
+            g_id_df = gID[["g_size"]].to_numpy().reshape(-1)
+            groupsize = np.amax(g_id_df)
             vars_name = ['x_' + str(i) for i in idx]
             var = [vars_dic[vname] for vname in vars_name]
             var = np.array(var)
-            prob += pulp.lpSum(var) <= len(idx)
+            prob += pulp.lpSum(var) <= groupsize
 
 
     prob.solve()
     print("Status:", pulp.LpStatus[prob.status])
     # for v in prob.variables():
     #     print(v.name, "=", v.varValue)
+
+    if prob.status == 1:
+        result = []
+        for v in prob.variables():
+            result.append([v.name, v.varValue])
+        return result
+    else:
+        return None
 
 def directForLoop(query, data_dir):
 
