@@ -23,14 +23,16 @@ def direct(query, dataframe):
 
     # generate variables and add objective function
     A_zero = query["A0"]
-    vars = Table[["id"]].to_numpy().reshape(-1)
+    # vars = Table[["id"]].to_numpy().reshape(-1)
+    vars = list(Table.index)
     vars_dic = pulp.LpVariable.dicts("x", vars, cat='Binary')
 
-    sketch = False
-    # sketch = True
+
     gid = 2  # or number of clusters
-    if sketch:
+    if 'gid' in Table.columns:
         vars_dic = pulp.LpVariable.dicts("x", vars, 0, None, cat=pulp.LpInteger)
+        gid_list = Table[["gid"]].to_numpy().reshape(-1)
+        gid = len(np.unique(gid_list))
 
     # vars_vector = np.vectorize(var_generator)
     # vars = vars_vector(vars)
@@ -73,7 +75,8 @@ def direct(query, dataframe):
     if 'gid' in Table.columns:
         for index in range(gid):
             gID = Table.loc[Table['gid'] == index]
-            idx = gID[["id"]].to_numpy().reshape(-1)
+            # idx = gID[["id"]].to_numpy().reshape(-1)
+            idx = list(gID.index)
             g_id_df = gID[["g_size"]].to_numpy().reshape(-1)
             groupsize = np.amax(g_id_df)
             vars_name = ['x_' + str(i) for i in idx]

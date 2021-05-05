@@ -13,7 +13,7 @@ def kd_tree(table_name, n_cluster, data_folder_path, temp_folder_path):
 
     # KMEANS cluster
     Table = pd.read_csv(path_to_dataset, sep=',')
-    cluster_label = DBSCAN(min_samples=100, eps=3555005.5, algorithm='kd_tree').fit(Table.to_numpy())
+    cluster_label = DBSCAN(min_samples=100, eps=2543210.5, algorithm='kd_tree').fit(Table.to_numpy())
     dataframe_cluster = Table
     dataframe_cluster['gid'] = cluster_label.labels_
     file_path = temp_folder_path + table_name + "_clustered" + ".csv"
