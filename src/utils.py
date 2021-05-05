@@ -22,7 +22,16 @@ def processInputFile(path_to_input_file):
         raise Exception('invalid input file')
     return data
 
+def getDataframe(query):
+    data_dir = 'data/'
+    table_name = query["table"]
+    path_to_dataset = data_dir + table_name + '.csv'
 
+    if not os.path.isfile(path_to_dataset):
+        # TODO maybe we can choose to return empty query result
+        raise Exception("can't find the table in the query")
+
+    return pd.read_csv(path_to_dataset)
 
 def setQueryTableName(query, table_name='tpch'):
     query['table'] = table_name
