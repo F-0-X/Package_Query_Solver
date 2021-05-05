@@ -6,7 +6,6 @@ import timeit
 
 
 def direct(query, dataframe):
-
     # table_name = query["table"]
     # path_to_dataset = data_dir + table_name + '.csv'
     #
@@ -14,7 +13,8 @@ def direct(query, dataframe):
     #     # TODO maybe we can choose to return empty query result
     #     raise Exception("can't find the table in the query")
     Table = dataframe
-
+    print(query)
+    print(Table)
     # defind min or max problem
     if query["max"] is False:
         prob = pulp.LpProblem("Package_Query_Minimize", pulp.LpMinimize)
@@ -27,12 +27,12 @@ def direct(query, dataframe):
     vars = list(Table.index)
     vars_dic = pulp.LpVariable.dicts("x", vars, cat='Binary')
 
-
     gid = 2  # or number of clusters
-    if 'gid' in Table.columns:
+    if 'gid' in Table.columns and 'g_size' in Table.columns:
         vars_dic = pulp.LpVariable.dicts("x", vars, 0, None, cat=pulp.LpInteger)
         gid_list = Table[["gid"]].to_numpy().reshape(-1)
         gid = len(np.unique(gid_list))
+
 
     # vars_vector = np.vectorize(var_generator)
     # vars = vars_vector(vars)
@@ -46,7 +46,6 @@ def direct(query, dataframe):
         # do not use np.dot, really slow
         # prob += pulp.lpSum( np.dot(A_zero_col, vars))
         prob += pulp.lpSum(A_zero_col * vars)
-
 
     # Lc and Uc constrains
     lower_count = query["Lc"]
@@ -63,7 +62,7 @@ def direct(query, dataframe):
         if constrains != 'None':
             cons_col = Table[[constrains]].to_numpy().reshape(-1)
 
-            cons_var = cons_col * vars # np.dot(cons_col, vars)
+            cons_var = cons_col * vars  # np.dot(cons_col, vars)
 
         lower_bound = query["L"][i]
         if lower_bound != 'None':
@@ -74,7 +73,7 @@ def direct(query, dataframe):
 
     # print(vars_dic)
     # if is using sketch
-    if 'gid' in Table.columns:
+    if 'gid' in Table.columns and 'g_size' in Table.columns:
         for index in range(gid):
             gID = Table.loc[Table['gid'] == index]
             # idx = gID[["id"]].to_numpy().reshape(-1)
@@ -100,6 +99,8 @@ def direct(query, dataframe):
     # else:
     #     return None
 
+    if prob.status != 1:
+        return None
     # a list to store original input tuples, maybe faster than using dataframe append/concat
     tuples_list = []
     # a list to store 'num_of_tuple'
@@ -118,8 +119,8 @@ def direct(query, dataframe):
     # +---------------+ -------- +------------- +
     return res_df
 
-def directForLoop(query, data_dir):
 
+def directForLoop(query, data_dir):
     table_name = query["table"]
     path_to_dataset = data_dir + table_name + '.csv'
 
@@ -141,10 +142,7 @@ def directForLoop(query, data_dir):
     for i in range(len(Table.index)):
         variables.append(var_generator(i + 1))
     # if A_zero == 'None':
-          # count
-
-
-
+    # count
 
     if prob.status:
         result = []

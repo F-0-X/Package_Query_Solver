@@ -116,8 +116,8 @@ class LoadAndWrite:
         return self.load_csv(file_path)
 
     def get_partition_group(self, table_name, partition_core, group_id):
-        file_path = self.partition_dir + table_name + ' ' +\
-            str(group_id) + partition_core.core_name + '.csv'
+        file_path = self.partition_dir + table_name + '_group' +\
+            str(group_id) + "_" + partition_core.core_name + '.csv'
         return self.load_csv(file_path)
 
 
@@ -157,8 +157,8 @@ class GroupAndRepresentationTuple:
         self.representation_tuple = representation_tuple
         # self.representation_tuple.reset_index(drop=True)
         self.group_df = group_df
-        self.group_id = representation_tuple['group_id']
-        self.num_of_tuple = representation_tuple['num_of_tuple']
+        self.group_id = int(representation_tuple['gid'])
+        self.num_of_tuple = int(representation_tuple['num_of_tuple'])
 
 
     def __eq__(self, other):
@@ -189,7 +189,7 @@ class GroupAndRepresentationTuple:
         return str(self.group_id)
 
     def get_group_df(self):
-        return self.df
+        return self.group_df
 
     def get_representation_tuple(self):
         return self.representation_tuple

@@ -1,9 +1,11 @@
+import copy
 from queue import Queue
 
 from src.Direct import direct
 from src.utils import OptimizeObjective, GroupAndRepresentationTuple, SimplePQ
 import random
 import pandas as pd
+import numpy as np
 
 
 class SketchRefine:
@@ -27,7 +29,8 @@ class SketchRefine:
         #  (We need to add some new global constraints to ensure that every representative tuple
         #  does not appear in sketch result more times than the size of its group
 
-        df = pd.read_csv('temp/tpch10_representative.csv')
+        # df = pd.read_csv('temp/tpch10_representative.csv')
+        df = rep_df
         # get average value for A1...Ak
         rep_mean = df.loc[df['rpst'] == 'MEAN']
 
@@ -65,10 +68,12 @@ class SketchRefine:
         
         """
         ps = direct(query=query, dataframe=R)
+
         # False or 'False'
-        ps['refined'] = [False in range(len(ps.index))]
+        append_col = [False] * ps.shape[0]
+        ps['refined'] = append_col
         # order boy gid
-        ps = ps.sort_values(by=['git'])
+        # ps = ps.sort_values(by=['git'])
         # TODO we finally return ps, which is a dataframe looks like this
         """
             +---------------+--------+-------------+-------+
@@ -88,7 +93,7 @@ class SketchRefine:
         """
         # TODO if ps is empty (infeasible), return None?
 
-        return 1
+        return ps
 
     # Note that this is a recursive function, and it relay on some class variable
     # Q is the package query to evaluate
@@ -119,14 +124,14 @@ class SketchRefine:
                 # This means the priority queue is empty
                 break
             curr_group_id = curr_group.get_group_id()
-            curr_representation_tuple = ps[(ps['group_id'] == curr_group_id) & (ps['refined'] == False)]
+            curr_representation_tuple = ps[(ps['gid'] == curr_group_id) & (ps['refined'] == False)]
             if curr_representation_tuple.empty:
                 continue
-
-            pi = direct(Q(curr_group, ps))
-
+            Q1, Q2 = Q(curr_group, ps)
+            pi = direct(Q1, Q2)
+            print(pi)
             if pi is not None:
-                ps_next = ps[(ps['group_id'] != curr_group_id) & (ps['refined'] == True)].copy()
+                ps_next = ps[(ps['gid'] != curr_group_id) & (ps['refined'] == True)].copy()
                 ps_next = ps_next.append(pi)
                 S.remove(curr_group)
 
@@ -147,7 +152,7 @@ class SketchRefine:
                     failed_groups.append(curr_group)
                     return None, failed_groups
 
-        # TODO check failed_group == S
+        # check failed_group == S
         if failed_groups != S:
             raise Exception('Something wrong with the refine')
         return None, failed_groups
@@ -157,35 +162,36 @@ class SketchRefine:
         #  call refine and return the result package
 
         def q(target, ps):
-            query_copy2 = query.copy()
+            query_copy2 = copy.deepcopy(query)
             if query_copy2['A0'] != 'None':
-                all_count = ps[query_copy2['A0']].sum()
+                all_count = int(ps['num_of_tuple'].sum())
                 others_count = all_count - target.get_num_of_tuple()
                 if query_copy2['Lc'] != 'None':
-                    query_copy2['Lc'] -= others_count
+                    query_copy2['Lc'] = int(query_copy2['Lc']) - others_count
                 if query_copy2['Uc'] != 'None':
-                    query_copy2['Uc'] -= others_count
+                    query_copy2['Uc'] = int(query_copy2['Uc']) - others_count
 
             for i, Ai in enumerate(query_copy2['A']):
                 all_sum = int((ps[Ai] * ps['num_of_tuple']).sum())
-                others_sum = all_sum - int(target.get_representation_tuple()[Ai][1]) * target.get_num_of_tuple()
+                others_sum = all_sum - int(target.get_representation_tuple()[Ai]) * target.get_num_of_tuple()
                 if query_copy2['L'][i] != 'None':
                     query_copy2['L'][i] -= others_sum
                 if query_copy2['U'][i] != 'None':
                     query_copy2['U'][i] -= others_sum
 
-            return query_copy2, target.get_group_df()
+                t_df = target.get_group_df()
+            return query_copy2, t_df
 
         table_name = query["table"]
         rep_df = load_write_helper.get_reprecentation(table_name, partition_core)
 
-        sketch_result = self.sketch(query.copy(), rep_df)
+        sketch_result = self.sketch(copy.deepcopy(query), rep_df)
 
         # we need to update the self.P, which is a set of utils.GroupAndRepresentationTuple
         self.P = set()
         for i in range(sketch_result.shape[0]):
             rep_tuple = sketch_result.loc[i, :]
-            group_id = rep_tuple['group_id']
+            group_id = int(rep_tuple['gid'])
             curr_df = load_write_helper.get_partition_group(table_name, partition_core, group_id)
             curr = GroupAndRepresentationTuple(rep_tuple, curr_df)
             self.P.add(curr)
