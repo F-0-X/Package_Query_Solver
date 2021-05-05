@@ -3,6 +3,7 @@ from queue import Queue
 from src.Direct import direct
 from src.utils import OptimizeObjective, GroupAndRepresentationTuple, SimplePQ
 import random
+import pandas as pd
 
 
 class SketchRefine:
@@ -25,6 +26,21 @@ class SketchRefine:
         # TODO secondly, we want to use Direct to solve the query with the representation table as input
         #  (We need to add some new global constraints to ensure that every representative tuple
         #  does not appear in sketch result more times than the size of its group
+
+        df = pd.read_csv('temp/tpch10_representative.csv')
+        # get average value for A1...Ak
+        rep_mean = df.loc[df['rpst'] == 'MEAN']
+
+        # if A0 is not none
+        if query['A0'] != 'None':
+            if query['max']:
+                rep_obj = df.loc[df['rpst'] == 'MAX']
+            else:
+                rep_obj = df.loc[df['rpst'] == 'MIN']
+            # replace A0 column
+            # TODO May need to add order by gid to ensure that the replacement is in order?
+            rep_mean[query['A0']] = rep_obj[query['A0']].values
+        # rep_mean is the representation table
 
         """
             representation table looks like this
