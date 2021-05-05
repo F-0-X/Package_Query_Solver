@@ -31,17 +31,18 @@ class TestDirect(TestCase):
             for size in range(len(dataset_size_list)):
                 dataset_name = 'tpch_' + dataset_size_list[size]
                 query = setQueryTableName(query=query, table_name=dataset_name)
+                df = getDataframe(query)
                 print(query['table'])
                 # run direct and record running time
                 start = timeit.default_timer()
-                direct(query=query, data_dir=path_to_dataset)
+                direct(query=query, dataframe=df)
                 stop = timeit.default_timer()
                 time_taken = stop - start
                 print('Time taken for Q', q, ' with size ', dataset_size_list[size], ': ', time_taken)
                 time_list.append(time_taken)
-            # write the time taken for running current query with different dataset size to a file
+                # write the time taken for running current query with different dataset size to a file
                 file_name = 'output/' + 'Time_List_Direct_Q' + str(q) + '.txt'
-                with open(file_name, 'w') as f:
+                with open(file_name, 'a') as f:
                     f.write("%s\n" % str(time_taken))
             # plot
             # plotDirect(direct_time_taken=time_list, query_name='Q' + str(q))
