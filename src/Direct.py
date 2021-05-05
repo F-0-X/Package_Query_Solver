@@ -27,11 +27,11 @@ def direct(query, dataframe):
     vars = list(Table.index)
     vars_dic = pulp.LpVariable.dicts("x", vars, cat='Binary')
 
-    gid = 2  # or number of clusters
+    n_gid = 2  # or number of clusters
     if 'gid' in Table.columns and 'g_size' in Table.columns:
         vars_dic = pulp.LpVariable.dicts("x", vars, 0, None, cat=pulp.LpInteger)
         gid_list = Table[["gid"]].to_numpy().reshape(-1)
-        gid = len(np.unique(gid_list))
+        n_gid = len(np.unique(gid_list))
 
 
     # vars_vector = np.vectorize(var_generator)
@@ -74,7 +74,7 @@ def direct(query, dataframe):
     # print(vars_dic)
     # if is using sketch
     if 'gid' in Table.columns and 'g_size' in Table.columns:
-        for index in range(gid):
+        for index in range(n_gid):
             gID = Table.loc[Table['gid'] == index]
             # idx = gID[["id"]].to_numpy().reshape(-1)
             idx = list(gID.index)
