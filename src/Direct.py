@@ -5,14 +5,15 @@ import numpy as np
 import timeit
 
 
-def direct(query, data_dir):
-    table_name = query["table"]
-    path_to_dataset = data_dir + table_name + '.csv'
+def direct(query, dataframe):
 
-    if not os.path.isfile(path_to_dataset):
-        # TODO maybe we can choose to return empty query result
-        raise Exception("can't find the table in the query")
-    Table = pd.read_csv(path_to_dataset, sep=',')
+    # table_name = query["table"]
+    # path_to_dataset = data_dir + table_name + '.csv'
+    #
+    # if not os.path.isfile(path_to_dataset):
+    #     # TODO maybe we can choose to return empty query result
+    #     raise Exception("can't find the table in the query")
+    Table = dataframe
 
     # defind min or max problem
     if query["max"] is False:
@@ -26,6 +27,7 @@ def direct(query, data_dir):
     vars_dic = pulp.LpVariable.dicts("x", vars, cat='Binary')
 
     sketch = False
+    # sketch = True
     gid = 2  # or number of clusters
     if sketch:
         vars_dic = pulp.LpVariable.dicts("x", vars, 0, None, cat=pulp.LpInteger)
@@ -38,9 +40,11 @@ def direct(query, data_dir):
         prob += pulp.lpSum(vars)
     else:
         A_zero_col = Table[[A_zero]].to_numpy().reshape(-1)
+
         # do not use np.dot, really slow
         # prob += pulp.lpSum( np.dot(A_zero_col, vars))
         prob += pulp.lpSum(A_zero_col * vars)
+
 
     # Lc and Uc constrains
     lower_count = query["Lc"]
@@ -56,7 +60,8 @@ def direct(query, data_dir):
         cons_var = vars
         if constrains != 'None':
             cons_col = Table[[constrains]].to_numpy().reshape(-1)
-            cons_var = cons_col * vars  # np.dot(cons_col, vars)
+
+            cons_var = cons_col * vars # np.dot(cons_col, vars)
 
         lower_bound = query["L"][i]
         if lower_bound != 'None':
@@ -65,7 +70,7 @@ def direct(query, data_dir):
         if upper_bound != 'None':
             prob += pulp.lpSum(cons_var) <= upper_bound
 
-    if sketch:
+    if 'gid' in Table.columns:
         for index in range(gid):
             gID = Table.loc[Table['gid'] == index]
             idx = gID[["id"]].to_numpy().reshape(-1)
@@ -76,9 +81,9 @@ def direct(query, data_dir):
             var = np.array(var)
             prob += pulp.lpSum(var) <= groupsize
 
-    prob.solve()
 
-    # print("Status:", pulp.LpStatus[prob.status])
+    prob.solve()
+    print("Status:", pulp.LpStatus[prob.status])
     # for v in prob.variables():
     #     print(v.name, "=", v.varValue)
 
@@ -90,8 +95,8 @@ def direct(query, data_dir):
     else:
         return None
 
-
 def directForLoop(query, data_dir):
+
     table_name = query["table"]
     path_to_dataset = data_dir + table_name + '.csv'
 
@@ -113,7 +118,10 @@ def directForLoop(query, data_dir):
     for i in range(len(Table.index)):
         variables.append(var_generator(i + 1))
     # if A_zero == 'None':
-    # count
+          # count
+
+
+
 
     if prob.status:
         result = []

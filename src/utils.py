@@ -22,7 +22,16 @@ def processInputFile(path_to_input_file):
         raise Exception('invalid input file')
     return data
 
+def getDataframe(query):
+    data_dir = 'data/'
+    table_name = query["table"]
+    path_to_dataset = data_dir + table_name + '.csv'
 
+    if not os.path.isfile(path_to_dataset):
+        # TODO maybe we can choose to return empty query result
+        raise Exception("can't find the table in the query")
+
+    return pd.read_csv(path_to_dataset)
 
 def setQueryTableName(query, table_name='tpch'):
     query['table'] = table_name
@@ -81,12 +90,15 @@ class LoadAndWrite:
         self.partition_dir = args.temp_dir
         self.data_dir = args.data_dir
 
+    def load_csv(self, path):
+        if not os.path.isfile(path):
+            raise Exception("can't find the table in the query")
+        return pd.read_csv(path, sep=',')
+
     # used by partition
     def load_initial_table(self, table_name):
         path_to_dataset = self.data_dir + table_name + '.csv'
-        if not os.path.isfile(path_to_dataset):
-            raise Exception("can't find the table in the query")
-        return pd.read_csv(path_to_dataset, sep=',')
+        return self.load_csv(path_to_dataset)
 
     def store_partition(self, df, table_name, partition_option):
         file_path = self.partition_dir + table_name + "_" + partition_option + ".csv"
@@ -97,13 +109,17 @@ class LoadAndWrite:
         return os.path.isfile(file_path)
 
     # This method is used by sketch to get the representation table
-    def getReprecentation(self, table_name, objective=OptimizeObjective.MAXIMIZE):
-        # TODO get path to file by table name and self.partition_dir
+    def get_reprecentation(self, table_name, partition_core):
+        # get path to file by table name and self.partition_dir
+        file_path = self.partition_dir + table_name + "_representation_" + partition_core.core_name + ".csv"
+        # read in corresponding csv
+        return self.load_csv(file_path)
 
-        # TODO read in corresponding csv
+    def get_partition_group(self, table_name, partition_core, group_id):
+        file_path = self.partition_dir + table_name + ' ' +\
+            str(group_id) + partition_core.core_name + '.csv'
+        return self.load_csv(file_path)
 
-        # TODO filter the df to get the representation table and return it
-        a = 1
 
     # TODO a helper function which can help us generate the name of partition file
 
@@ -137,12 +153,13 @@ class SimplePQ:
 
 class GroupAndRepresentationTuple:
 
-    def __init__(self, group_id, group_df=None, representation_tuple=None, num_of_tuple=1):
-        self.group_df = group_df
-        self.group_id = group_id
+    def __init__(self, representation_tuple, group_df=None):
         self.representation_tuple = representation_tuple
-        self.num_of_tuple = num_of_tuple
-        self.representation_tuple.reset_index(drop=True)
+        # self.representation_tuple.reset_index(drop=True)
+        self.group_df = group_df
+        self.group_id = representation_tuple['group_id']
+        self.num_of_tuple = representation_tuple['num_of_tuple']
+
 
     def __eq__(self, other):
         return self.group_id == other.group_id

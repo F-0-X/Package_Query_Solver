@@ -1,10 +1,10 @@
 import argparse
-import os
 
 from Direct import *
 from src.SketchRefine import SketchRefine
 from src.utils import *
 from partition import *
+
 
 def main(args):
     print(args)
@@ -20,16 +20,16 @@ def main(args):
         partition_core = KmeansPartitionCore(2)
         partition(partition_core, 'tpch10', load_write_helper)
 
-        # worker = SketchRefine()
-        # worker.sketch_and_refine(query, load_write_helper) # TODO add parameter here
+        worker = SketchRefine()
+        worker.sketch_and_refine(query, load_write_helper, partition_core)  # TODO add parameter here
     else:
         print('Direct Mode')
         direct(query, args.data_dir)
 
 
-
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='pqql')
+
+    parser = argparse.ArgumentParser(description='paql')
 
     parser.add_argument("-a", "--advance", action="store_true",
                         help="Advance mode - Use SketchRefine instead of Direct")
