@@ -5,15 +5,15 @@ import numpy as np
 import timeit
 
 
-def direct(query, data_dir):
+def direct(query, dataframe):
 
-    table_name = query["table"]
-    path_to_dataset = data_dir + table_name + '.csv'
-
-    if not os.path.isfile(path_to_dataset):
-        # TODO maybe we can choose to return empty query result
-        raise Exception("can't find the table in the query")
-    Table = pd.read_csv(path_to_dataset, sep=',')
+    # table_name = query["table"]
+    # path_to_dataset = data_dir + table_name + '.csv'
+    #
+    # if not os.path.isfile(path_to_dataset):
+    #     # TODO maybe we can choose to return empty query result
+    #     raise Exception("can't find the table in the query")
+    Table = dataframe
 
     # defind min or max problem
     if query["max"] is False:
@@ -70,8 +70,7 @@ def direct(query, data_dir):
         if upper_bound != 'None':
             prob += pulp.lpSum(cons_var) <= upper_bound
 
-
-    if sketch:
+    if 'gid' in Table.columns:
         for index in range(gid):
             gID = Table.loc[Table['gid'] == index]
             idx = gID[["id"]].to_numpy().reshape(-1)
