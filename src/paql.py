@@ -24,7 +24,8 @@ def main(args):
         worker.sketch_and_refine(query, load_write_helper, partition_core)  # TODO add parameter here
     else:
         print('Direct Mode')
-        direct(query, args.data_dir)
+        df = load_write_helper.load_initial_table(query['table'])
+        direct(query, df)
 
 
 if __name__ == '__main__':
