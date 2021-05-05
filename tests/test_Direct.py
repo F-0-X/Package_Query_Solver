@@ -40,9 +40,8 @@ class TestDirect(TestCase):
                 print('Time taken for Q', q, ' with size ', dataset_size_list[size], ': ', time_taken)
                 time_list.append(time_taken)
             # write the time taken for running current query with different dataset size to a file
-            file_name = 'output/' + 'Time_List_Direct_Q' + str(q + 1) + '.txt'
-            with open(file_name, 'w') as f:
-                for item in time_list:
-                    f.write("%s\n" % item)
+                file_name = 'output/' + 'Time_List_Direct_Q' + str(q) + '.txt'
+                with open(file_name, 'w') as f:
+                    f.write("%s\n" % str(time_taken))
             # plot
-            plotDirect(direct_time_taken=time_list, query_name='Q' + str(q))
+            # plotDirect(direct_time_taken=time_list, query_name='Q' + str(q))
