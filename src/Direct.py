@@ -72,6 +72,8 @@ def direct(query, dataframe):
         if upper_bound != 'None':
             prob += pulp.lpSum(cons_var) <= upper_bound
 
+    # print(vars_dic)
+    # if is using sketch
     if 'gid' in Table.columns:
         for index in range(gid):
             gID = Table.loc[Table['gid'] == index]
@@ -79,7 +81,7 @@ def direct(query, dataframe):
             idx = list(gID.index)
             g_id_df = gID[["g_size"]].to_numpy().reshape(-1)
             groupsize = np.amax(g_id_df)
-            vars_name = ['x_' + str(i) for i in idx]
+            vars_name = [i for i in idx]
             var = [vars_dic[vname] for vname in vars_name]
             var = np.array(var)
             prob += pulp.lpSum(var) <= groupsize
@@ -90,13 +92,31 @@ def direct(query, dataframe):
     # for v in prob.variables():
     #     print(v.name, "=", v.varValue)
 
-    if prob.status == 1:
-        result = []
-        for v in prob.variables():
-            result.append([v.name, v.varValue])
-        return result
-    else:
-        return None
+    # if prob.status == 1:
+    #     result = []
+    #     for v in prob.variables():
+    #         result.append([v.name, v.varValue])
+    #     return result
+    # else:
+    #     return None
+
+    # a list to store original input tuples, maybe faster than using dataframe append/concat
+    tuples_list = []
+    # a list to store 'num_of_tuple'
+    num_tuples_list = []
+    # for each variables(rows)
+    for v in prob.variables():
+        # number of times the tuple we repeatedly choose, can be 0
+        # for i in range(int(v.varValue)):
+        tuples_list.append(dataframe.iloc[int(v.name[2:]), :])
+        num_tuples_list.append(int(v.varValue))
+    res_df = pd.DataFrame(tuples_list)
+    res_df['num_of_tuple'] = num_tuples_list
+    # return a new df:
+    # +---------------+ -------- +------------- +
+    # |original fields| group_id | num_of_tuple |
+    # +---------------+ -------- +------------- +
+    return res_df
 
 def directForLoop(query, data_dir):
 
