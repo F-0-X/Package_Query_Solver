@@ -40,8 +40,9 @@ class SketchRefine:
             # replace A0 column
             # TODO May need to add order by gid to ensure that the replacement is in order?
             rep_mean[query['A0']] = rep_obj[query['A0']].values
-        # rep_mean is the representation table
-
+        rep_mean.drop(columns='rpst')
+        # R = representation table
+        R = rep_mean.drop(columns='rpst')
         """
             representation table looks like this
             +---------------+--------+
