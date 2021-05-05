@@ -1,4 +1,4 @@
-from sklearn.cluster import DBSCAN
+from sklearn.cluster import AgglomerativeClustering
 import numpy as np
 import pandas as pd
 import os
@@ -13,12 +13,14 @@ def kd_tree(table_name, n_cluster, data_folder_path, temp_folder_path):
 
     # KMEANS cluster
     Table = pd.read_csv(path_to_dataset, sep=',')
-    cluster_label = DBSCAN(min_samples=100, eps=2543210.5, algorithm='kd_tree').fit(Table.to_numpy())
+    cluster_label = AgglomerativeClustering(n_clusters=n_cluster,linkage='complete').fit_predict(Table.to_numpy())
     dataframe_cluster = Table
-    dataframe_cluster['gid'] = cluster_label.labels_
+    dataframe_cluster['gid'] = cluster_label
     file_path = temp_folder_path + table_name + "_clustered" + ".csv"
     dataframe_cluster.to_csv(file_path, index=False)
 
+    unique, counts = np.unique(cluster_label, return_counts=True)
+    print(dict(zip(unique, counts)))
     # represent = []
     # for i in range(n_cluster):
     #     df = dataframe_cluster.loc[dataframe_cluster['gid'] == i]
@@ -57,6 +59,6 @@ def kd_tree(table_name, n_cluster, data_folder_path, temp_folder_path):
 from timeit import default_timer as timer
 
 start = timer()
-a = kd_tree('tpch1000', 2, 'data/', 'temp/')
+a = kd_tree('tpch1000', 10, 'data/', 'temp/')
 end = timer()
 print("time is ", end - start)
