@@ -38,11 +38,15 @@ class SketchRefine:
             else:
                 rep_obj = df.loc[df['rpst'] == 'MIN']
             # replace A0 column
-            # TODO May need to add order by gid to ensure that the replacement is in order?
+            # TODO May need to add (order by gid) to ensure that the replacement is in order?
+            #  maybe raise exception when row number differs
             rep_mean[query['A0']] = rep_obj[query['A0']].values
+        # delete rpst column, no longer needed
         rep_mean.drop(columns='rpst')
         # R = representation table
         R = rep_mean.drop(columns='rpst')
+        # reset index for using direct method
+        R = R.reset_index(drop=True)
         """
             representation table looks like this
             +---------------+--------+
@@ -60,8 +64,11 @@ class SketchRefine:
             +---------------+--------+
         
         """
-
-
+        ps = direct(query=query, dataframe=R)
+        # False or 'False'
+        ps['refined'] = [False in range(len(ps.index))]
+        # order boy gid
+        ps = ps.sort_values(by=['git'])
         # TODO we finally return ps, which is a dataframe looks like this
         """
             +---------------+--------+-------------+-------+
@@ -79,6 +86,7 @@ class SketchRefine:
             +---------------+--------+-------------+-------+
         
         """
+        # TODO if ps is empty (infeasible), return None?
 
         return 1
 
