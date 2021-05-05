@@ -73,6 +73,8 @@ class KmeansPartitionCore:
             represent.append(meanc)
 
         represent = np.array(represent)
+        represent[:, 0] = np.arange(1, len(represent) + 1)
+        represent = np.array(represent)
         re_col = list(dataframe_cluster.columns)
         re_col.append("rpst")
         re_col.append("g_size")
