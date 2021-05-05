@@ -151,12 +151,18 @@ class SketchRefine:
 
             return query_copy2, target.get_group_df()
 
-        rep_df = load_write_helper.get_reprecentation(query["table"], partition_core)
+        table_name = query["table"]
+        rep_df = load_write_helper.get_reprecentation(table_name, partition_core)
 
         sketch_result = self.sketch(query.copy(), rep_df)
-        # TODO we need to update the self.P, which is a set of utils.GroupAndRepresentationTuple
+
+        # we need to update the self.P, which is a set of utils.GroupAndRepresentationTuple
         self.P = set()
-
-
+        for i in range(sketch_result.shape[0]):
+            rep_tuple = sketch_result.loc[i, :]
+            group_id = rep_tuple['group_id']
+            curr_df = load_write_helper.get_partition_group(table_name, partition_core, group_id)
+            curr = GroupAndRepresentationTuple(rep_tuple, curr_df)
+            self.P.add(curr)
 
         return self.refine(q, self.P.copy(), sketch_result)

@@ -104,7 +104,12 @@ class LoadAndWrite:
         # get path to file by table name and self.partition_dir
         file_path = self.partition_dir + table_name + "_representation_" + partition_core.core_name + ".csv"
         # read in corresponding csv
-        return self.load_csv()
+        return self.load_csv(file_path)
+
+    def get_partition_group(self, table_name, partition_core, group_id):
+        file_path = self.partition_dir + table_name + ' ' +\
+            str(group_id) + partition_core.core_name + '.csv'
+        return self.load_csv(file_path)
 
 
     # TODO a helper function which can help us generate the name of partition file
@@ -141,10 +146,10 @@ class GroupAndRepresentationTuple:
 
     def __init__(self, representation_tuple, group_df=None):
         self.representation_tuple = representation_tuple
-        self.representation_tuple.reset_index(drop=True)
+        # self.representation_tuple.reset_index(drop=True)
         self.group_df = group_df
-        self.group_id = 1
-        self.num_of_tuple = 1
+        self.group_id = representation_tuple['group_id']
+        self.num_of_tuple = representation_tuple['num_of_tuple']
 
 
     def __eq__(self, other):
