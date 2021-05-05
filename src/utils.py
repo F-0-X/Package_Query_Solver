@@ -79,9 +79,25 @@ class LoadAndWrite:
 
     def __init__(self, args):
         self.partition_dir = args.temp_dir
+        self.data_dir = args.data_dir
+
+    # used by partition
+    def load_initial_table(self, table_name):
+        path_to_dataset = self.data_dir + table_name + '.csv'
+        if not os.path.isfile(path_to_dataset):
+            raise Exception("can't find the table in the query")
+        return pd.read_csv(path_to_dataset, sep=',')
+
+    def store_partition(self, df, table_name, partition_option):
+        file_path = self.partition_dir + table_name + "_" + partition_option + ".csv"
+        df.to_csv(file_path, index=False)
+
+    def already_partitioned(self, table_name, partition_option):
+        file_path = self.partition_dir + table_name + "_" + partition_option + ".csv"
+        return os.path.isfile(file_path)
 
     # This method is used by sketch to get the representation table
-    def getReprecentation(table_name, objective=OptimizeObjective.MAXIMIZE):
+    def getReprecentation(self, table_name, objective=OptimizeObjective.MAXIMIZE):
         # TODO get path to file by table name and self.partition_dir
 
         # TODO read in corresponding csv

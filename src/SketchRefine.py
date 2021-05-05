@@ -19,7 +19,7 @@ class SketchRefine:
         table_name = query["table"]
         objective = OptimizeObjective.MAXIMIZE
         if not query['max']:
-            objective = OptimizeObjective.MAXIMIZE
+            objective = OptimizeObjective.MINIMIZE
         rep_df = load_write_helper.getReprecentation(table_name, objective)
 
         # TODO secondly, we want to use Direct to solve the query with the representation table as input

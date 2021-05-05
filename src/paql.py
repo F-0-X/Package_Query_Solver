@@ -17,11 +17,11 @@ def main(args):
         print('SketchRefine Mode')
         # TODO we need to call this function for all large csv in the data folder(and don't delete if forever)
         # TODO we need to skip making partition if we already do the partition
-        partition_core = QuadTreePartitionCore() # TODO add parameter
-        partition(partition_core, "tpch", args.data_dir, args.temp_dir)
+        partition_core = KmeansPartitionCore(2)
+        partition(partition_core, 'tpch10', load_write_helper)
 
-        worker = SketchRefine()
-        worker.sketch_and_refine(query, load_write_helper) # TODO add parameter here
+        # worker = SketchRefine()
+        # worker.sketch_and_refine(query, load_write_helper) # TODO add parameter here
     else:
         print('Direct Mode')
         direct(query, args.data_dir)

@@ -3,3 +3,5 @@ venv/
 src/__pycache__/
 try/
 data/tpch.csv
+output/*.png
+output/*.txt
