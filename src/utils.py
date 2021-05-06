@@ -89,6 +89,7 @@ class LoadAndWrite:
     def __init__(self, args):
         self.partition_dir = args.temp_dir
         self.data_dir = args.data_dir
+        self.output_dir = args.output_dir
 
     def load_csv(self, path):
         if not os.path.isfile(path):
@@ -120,6 +121,17 @@ class LoadAndWrite:
             str(group_id) + "_" + partition_core.core_name + '.csv'
         return self.load_csv(file_path)
 
+    def store_output(self, df, table_name, partition_core, is_direct_mode=False):
+        if df is None:
+            return
+        mode = '_SR'
+        if is_direct_mode:
+            mode = '_D'
+        file_path = self.output_dir + table_name + " " + partition_core.core_name + mode + '.csv'
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+
+        df.to_csv(file_path, index=False)
 
     # TODO a helper function which can help us generate the name of partition file
 

@@ -17,16 +17,18 @@ def main(args):
         print('SketchRefine Mode')
         # TODO we need to call this function for all large csv in the data folder(and don't delete if forever)
         # TODO we need to skip making partition if we already do the partition
+
         partition_core = KmeansPartitionCore(2)
-        partition(partition_core, 'tpch10', load_write_helper)
+        partition(partition_core, query['table'], load_write_helper)
 
         worker = SketchRefine()
-        worker.sketch_and_refine(query, load_write_helper, partition_core)  # TODO add parameter here
+        sketch_result_df = worker.sketch_and_refine(query, load_write_helper, partition_core)
+        load_write_helper.store_output(sketch_result_df, query['table'], partition_core)
     else:
         print('Direct Mode')
         df = load_write_helper.load_initial_table(query['table'])
-        direct(query, df)
-
+        direct_df = direct(query, df)
+        a = 1
 
 if __name__ == '__main__':
 
@@ -40,7 +42,7 @@ if __name__ == '__main__':
     # argument for default input(json file) address
     parser.add_argument("--input_file", default="Q2.json", type=str, help="input file name")
 
-    # TODO add argument for default output directory and file name
+    parser.add_argument("--output_dir", default="output/", type=str, help="result folder")
 
     # add argument for default dataset folder
     parser.add_argument("--data_dir", default="data/", type=str, help="folder storing datasets")
