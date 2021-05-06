@@ -5,7 +5,7 @@ import numpy as np
 import timeit
 
 
-def direct(query, dataframe):
+def direct(query, dataframe, is_sketch=False, num_tuple=False):
     # table_name = query["table"]
     # path_to_dataset = data_dir + table_name + '.csv'
     #
@@ -28,7 +28,10 @@ def direct(query, dataframe):
     vars_dic = pulp.LpVariable.dicts("x", vars, cat='Binary')
 
     gid = 2  # or number of clusters
-    if 'gid' in Table.columns and 'g_size' in Table.columns:
+    # if 'gid' in Table.columns and 'g_size' in Table.columns:
+
+    # if is using sketch, need LpInteger mode instead of boolean
+    if is_sketch:
         vars_dic = pulp.LpVariable.dicts("x", vars, 0, None, cat=pulp.LpInteger)
         gid_list = Table[["gid"]].to_numpy().reshape(-1)
         gid = len(np.unique(gid_list))
@@ -73,7 +76,8 @@ def direct(query, dataframe):
 
     # print(vars_dic)
     # if is using sketch
-    if 'gid' in Table.columns and 'g_size' in Table.columns:
+    # if 'gid' in Table.columns and 'g_size' in Table.columns:
+    if is_sketch:
         for index in range(gid):
             gID = Table.loc[Table['gid'] == index]
             # idx = gID[["id"]].to_numpy().reshape(-1)
@@ -109,10 +113,16 @@ def direct(query, dataframe):
     for v in prob.variables():
         # number of times the tuple we repeatedly choose, can be 0
         # for i in range(int(v.varValue)):
-        tuples_list.append(dataframe.iloc[int(v.name[2:]), :])
-        num_tuples_list.append(int(v.varValue))
+
+        # if current representative is selected at least once
+        # add to result dataframe
+        if int(v.varValue) != 0:
+            tuples_list.append(dataframe.iloc[int(v.name[2:]), :])
+            num_tuples_list.append(int(v.varValue))
     res_df = pd.DataFrame(tuples_list)
-    res_df['num_of_tuple'] = num_tuples_list
+    # if we are using sketch, we need an extra column 'num_of_tuple'
+    if is_sketch or num_tuple:
+        res_df['num_of_tuple'] = num_tuples_list
     # return a new df:
     # +---------------+ -------- +------------- +
     # |original fields| group_id | num_of_tuple |
