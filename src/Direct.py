@@ -28,10 +28,11 @@ def direct(query, dataframe):
     vars_dic = pulp.LpVariable.dicts("x", vars, cat='Binary')
 
     gid = 2  # or number of clusters
-    if 'gid' in Table.columns:
+    if 'gid' in Table.columns and 'g_size' in Table.columns:
         vars_dic = pulp.LpVariable.dicts("x", vars, 0, None, cat=pulp.LpInteger)
         gid_list = Table[["gid"]].to_numpy().reshape(-1)
         gid = len(np.unique(gid_list))
+
 
     # vars_vector = np.vectorize(var_generator)
     # vars = vars_vector(vars)
@@ -83,6 +84,7 @@ def direct(query, dataframe):
             var = [vars_dic[vname] for vname in vars_name]
             var = np.array(var)
             prob += pulp.lpSum(var) <= groupsize
+
 
     prob.solve()
     print("Status:", pulp.LpStatus[prob.status])

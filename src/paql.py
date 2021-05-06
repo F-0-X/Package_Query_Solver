@@ -40,7 +40,7 @@ if __name__ == '__main__':
     # argument for default read in data file address
     parser.add_argument("--input_dir", default="./input/", type=str, help="folder for input json file")
     # argument for default input(json file) address
-    parser.add_argument("--input_file", default="Q2.json", type=str, help="input file name")
+    parser.add_argument("--input_file", default="Q5.json", type=str, help="input file name")
 
     parser.add_argument("--output_dir", default="output/", type=str, help="result folder")
 

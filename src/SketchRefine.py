@@ -69,8 +69,10 @@ class SketchRefine:
         """
         ps = direct(query=query, dataframe=R)
 
+
         if ps is None:
             return None
+
         # False or 'False'
         append_col = [False] * ps.shape[0]
         ps['refined'] = append_col
@@ -112,7 +114,7 @@ class SketchRefine:
             return ps, failed_groups
 
         random_S = list(S)
-        # random.shuffle(random_S)
+        random.shuffle(random_S)
 
         high_priority_queue = Queue()
         low_priority_queue = Queue()
@@ -131,6 +133,7 @@ class SketchRefine:
                 continue
             Q1, Q2 = Q(curr_group, ps)
             pi = direct(Q1, Q2)
+
             append_col = [True] * pi.shape[0]
             pi['refined'] = append_col
 

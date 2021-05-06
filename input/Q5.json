@@ -1,0 +1,16 @@
+{
+   "table":"tpch10",
+   "max": false,
+   "A0": "ps_min_supplycost",
+   "Lc": "1",
+   "Uc": "None",
+   "A": [
+     "p_size"
+   ],
+   "L":[
+      "None"
+   ],
+   "U":[
+      20
+   ]
+}
