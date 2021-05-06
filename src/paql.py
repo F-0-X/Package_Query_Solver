@@ -1,5 +1,5 @@
 import argparse
-
+import timeit
 from Direct import *
 from src.SketchRefine import SketchRefine
 from src.utils import *
@@ -24,7 +24,10 @@ def main(args):
         partition(partition_core, query['table'], load_write_helper)
 
         worker = SketchRefine()
+        start = timeit.default_timer()
         sketch_result_df = worker.sketch_and_refine(query, load_write_helper, partition_core)
+        stop = timeit.default_timer()
+        print("sketch refine time taken for " + query_name + " : " + str(stop - start))
         load_write_helper.store_output(sketch_result_df, query['table'], query_name, partition_core=partition_core)
     else:
         print('Direct Mode')
