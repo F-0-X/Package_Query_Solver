@@ -44,6 +44,8 @@ class SketchRefine:
             # TODO May need to add (order by gid) to ensure that the replacement is in order?
             #  maybe raise exception when row number differs
             rep_mean[query['A0']] = rep_obj[query['A0']].values
+        pd.set_option('display.max_columns', None)
+        # print(rep_mean)
         # delete rpst column, no longer needed
         rep_mean.drop(columns='rpst')
         # R = representation table
@@ -67,11 +69,15 @@ class SketchRefine:
             +---------------+--------+
         
         """
-        ps = direct(query=query, dataframe=R)
+        ps = direct(query=query, dataframe=R, is_sketch=True)
 
+        # return none if there is no optimal solution
+        if ps is not None:
+            ps = ps.drop(columns='g_size')
+        # otherwise we return a (result dataframe from direct) + (a column specifying all tuples are not refined yet)
         # False or 'False'
-        append_col = [False] * ps.shape[0]
-        ps['refined'] = append_col
+            append_col = [False] * ps.shape[0]
+            ps['refined'] = append_col
         # order boy gid
         # ps = ps.sort_values(by=['git'])
         # TODO we finally return ps, which is a dataframe looks like this
@@ -91,7 +97,7 @@ class SketchRefine:
             +---------------+--------+-------------+-------+
         
         """
-        # TODO if ps is empty (infeasible), return None?
+        # if ps is empty (infeasible), would return None
 
         return ps
 
