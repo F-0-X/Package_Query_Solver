@@ -138,7 +138,7 @@ class SketchRefine:
             if curr_group.get_num_of_tuple == 0:
                 continue
             Q1, Q2 = Q(curr_group, ps)
-            pi = direct(Q1, Q2)
+            pi = direct(Q1, Q2, num_tuple=True)
 
             append_col = [True] * pi.shape[0]
             pi['refined'] = append_col
@@ -196,7 +196,7 @@ class SketchRefine:
             return query_copy2, t_df
 
         table_name = query["table"]
-        rep_df = load_write_helper.get_reprecentation(table_name, partition_core)
+        rep_df = load_write_helper.get_representation(table_name, partition_core)
 
         sketch_result = self.sketch(copy.deepcopy(query), rep_df)
         if sketch_result is None:
@@ -204,8 +204,9 @@ class SketchRefine:
 
         # we need to update the self.P, which is a set of utils.GroupAndRepresentationTuple
         self.P = set()
-        for i in range(sketch_result.shape[0]):
-            rep_tuple = sketch_result.loc[i, :]
+        # for i in range(sketch_result.shape[0]):
+        #     rep_tuple = sketch_result.loc[i, :]
+        for index, rep_tuple in sketch_result.iterrows():
             group_id = int(rep_tuple['gid'])
             curr_df = load_write_helper.get_partition_group(table_name, partition_core, group_id)
             curr = GroupAndRepresentationTuple(rep_tuple, curr_df)

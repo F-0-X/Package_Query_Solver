@@ -4,6 +4,7 @@ from Direct import *
 from src.SketchRefine import SketchRefine
 from src.utils import *
 from partition import *
+import os
 
 
 def main(args):
@@ -12,22 +13,24 @@ def main(args):
     path_to_input_file = os.path.join(args.input_dir, args.input_file)
     query = processInputFile(path_to_input_file)
     load_write_helper = LoadAndWrite(args)
+    query_name = os.path.splitext(args.input_file)[0]
 
     if args.advance:
         print('SketchRefine Mode')
         # TODO we need to call this function for all large csv in the data folder(and don't delete if forever)
         # TODO we need to skip making partition if we already do the partition
 
-        partition_core = KmeansPartitionCore(2)
+        partition_core = KmeansPartitionCore(400)
         partition(partition_core, query['table'], load_write_helper)
 
         worker = SketchRefine()
         sketch_result_df = worker.sketch_and_refine(query, load_write_helper, partition_core)
-        load_write_helper.store_output(sketch_result_df, query['table'], partition_core)
+        load_write_helper.store_output(sketch_result_df, query['table'], query_name, partition_core=partition_core)
     else:
         print('Direct Mode')
         df = load_write_helper.load_initial_table(query['table'])
         direct_df = direct(query, df)
+        load_write_helper.store_output(direct_df, query['table'], query_name, is_direct_mode=True)
         a = 1
 
 if __name__ == '__main__':
@@ -40,7 +43,7 @@ if __name__ == '__main__':
     # argument for default read in data file address
     parser.add_argument("--input_dir", default="./input/", type=str, help="folder for input json file")
     # argument for default input(json file) address
-    parser.add_argument("--input_file", default="Q5.json", type=str, help="input file name")
+    parser.add_argument("--input_file", default="Q3.json", type=str, help="input file name")
 
     parser.add_argument("--output_dir", default="output/", type=str, help="result folder")
 
