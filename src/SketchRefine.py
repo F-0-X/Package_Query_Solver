@@ -71,16 +71,21 @@ class SketchRefine:
         """
         ps = direct(query=query, dataframe=R, is_sketch=True)
 
-        # return none if there is no optimal solution
-        if ps is not None:
-            ps = ps.drop(columns='g_size')
+
+
+        if ps is None:
+            return None
+
         # otherwise we return a (result dataframe from direct) + (a column specifying all tuples are not refined yet)
-        # False or 'False'
-            append_col = [False] * ps.shape[0]
-            ps['refined'] = append_col
+
+        append_col = [False] * ps.shape[0]
+        ps['refined'] = append_col
+        ps = ps.drop(columns='g_size')
+
         # order boy gid
         # ps = ps.sort_values(by=['git'])
-        # TODO we finally return ps, which is a dataframe looks like this
+
+        # we finally return ps, which is a dataframe looks like this
         """
             +---------------+--------+-------------+-------+
             |original fields|group_id| num_of_tuple|refined|
@@ -130,21 +135,23 @@ class SketchRefine:
                 # This means the priority queue is empty
                 break
             curr_group_id = curr_group.get_group_id()
-            curr_representation_tuple = ps[(ps['gid'] == curr_group_id) & (ps['refined'] == False)]
-            if curr_representation_tuple.empty:
+            if curr_group.get_num_of_tuple == 0:
                 continue
             Q1, Q2 = Q(curr_group, ps)
-            pi = direct(Q1, Q2)
-            print(pi)
+            pi = direct(Q1, Q2, num_tuple=True)
+
+            append_col = [True] * pi.shape[0]
+            pi['refined'] = append_col
+
             if pi is not None:
-                ps_next = ps[(ps['gid'] != curr_group_id) & (ps['refined'] == True)].copy()
+                ps_next = ps[(ps['gid'] != curr_group_id) | (ps['refined'] == True)].copy()
                 ps_next = ps_next.append(pi)
                 S.remove(curr_group)
 
                 p, failed_groups_new = self.refine(Q, S, ps_next)
                 S.add(curr_group)
 
-                if failed_groups_new is not None and not failed_groups_new.empty():
+                if failed_groups_new is not None and len(failed_groups_new) > 0:
                     # refine failure
                     # greedily prioritize non-refinable groups
                     pq.prioritize(failed_groups_new)  # This method also update failed_group
@@ -189,17 +196,21 @@ class SketchRefine:
             return query_copy2, t_df
 
         table_name = query["table"]
-        rep_df = load_write_helper.get_reprecentation(table_name, partition_core)
+        rep_df = load_write_helper.get_representation(table_name, partition_core)
 
         sketch_result = self.sketch(copy.deepcopy(query), rep_df)
+        if sketch_result is None:
+            return None
 
         # we need to update the self.P, which is a set of utils.GroupAndRepresentationTuple
         self.P = set()
-        for i in range(sketch_result.shape[0]):
-            rep_tuple = sketch_result.loc[i, :]
+        # for i in range(sketch_result.shape[0]):
+        #     rep_tuple = sketch_result.loc[i, :]
+        for index, rep_tuple in sketch_result.iterrows():
             group_id = int(rep_tuple['gid'])
             curr_df = load_write_helper.get_partition_group(table_name, partition_core, group_id)
             curr = GroupAndRepresentationTuple(rep_tuple, curr_df)
             self.P.add(curr)
 
-        return self.refine(q, self.P.copy(), sketch_result)
+        refine_result, refine_failed_group = self.refine(q, self.P.copy(), sketch_result)
+        return refine_result

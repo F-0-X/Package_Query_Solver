@@ -5,3 +5,4 @@ try/
 data/tpch.csv
 output/*.png
 output/*.txt
+output/*.csv

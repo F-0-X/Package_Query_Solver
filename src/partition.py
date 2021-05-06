@@ -10,7 +10,7 @@ import os
 # Then we call the store the groups in the temp_folder_path
 def partition(partition_core, table_name, load_write_helper):
     # skip the partition process if we already do the partition
-    if load_write_helper.already_partitioned(table_name + "_representation", partition_core.core_name):
+    if load_write_helper.already_partitioned(table_name, partition_core.core_name):
         print("Skip Partition(we have already partition this table with this partition core)")
         return
 
@@ -22,12 +22,12 @@ def partition(partition_core, table_name, load_write_helper):
 
     #  store the result to the temp folder, we not only store the partitions
     #  but also store the minimum, maximum and average value of all the partitioning attributes
-    load_write_helper.store_partition(dataframe_cluster, table_name + "_clustered", partition_core.core_name)
+    load_write_helper.store_partition(dataframe_cluster, table_name, partition_core.core_name, "clustered")
 
     for i, dfi in enumerate(groups):
-        load_write_helper.store_partition(dfi, table_name + "_group" + str(i), partition_core.core_name)
+        load_write_helper.store_partition(dfi, table_name, partition_core.core_name, "group" + str(i))
 
-    load_write_helper.store_partition(repre_df, table_name + "_representation", partition_core.core_name)
+    load_write_helper.store_partition(repre_df, table_name, partition_core.core_name, "representation")
 
 
 class KmeansPartitionCore:

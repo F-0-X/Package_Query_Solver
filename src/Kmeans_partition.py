@@ -62,7 +62,7 @@ a = Kmeans_part('tpch10', 2, 'data/', 'temp/')
 end = timer()
 print("time is ", end - start)
 
-# Table = pd.read_csv('../data/tpch10.csv', sep=',')
+# Table = pd.read_csv('../data/tpch30.csv', sep=',')
 # record time for clustering
 # start = timer()
 # a = Kmeans_part(Table, 15)

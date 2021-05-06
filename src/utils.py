@@ -89,6 +89,7 @@ class LoadAndWrite:
     def __init__(self, args):
         self.partition_dir = args.temp_dir
         self.data_dir = args.data_dir
+        self.output_dir = args.output_dir
 
     def load_csv(self, path):
         if not os.path.isfile(path):
@@ -100,26 +101,39 @@ class LoadAndWrite:
         path_to_dataset = self.data_dir + table_name + '.csv'
         return self.load_csv(path_to_dataset)
 
-    def store_partition(self, df, table_name, partition_option):
-        file_path = self.partition_dir + table_name + "_" + partition_option + ".csv"
+    def store_partition(self, df, table_name, partition_option, part_name):
+        file_path = self.partition_dir + table_name + "_" + partition_option + "_" + part_name + ".csv"
         df.to_csv(file_path, index=False)
 
     def already_partitioned(self, table_name, partition_option):
-        file_path = self.partition_dir + table_name + "_" + partition_option + ".csv"
+        file_path = self.partition_dir + table_name + "_" + partition_option + "_clustered.csv"
         return os.path.isfile(file_path)
 
     # This method is used by sketch to get the representation table
-    def get_reprecentation(self, table_name, partition_core):
+    def get_representation(self, table_name, partition_core):
         # get path to file by table name and self.partition_dir
-        file_path = self.partition_dir + table_name + "_representation_" + partition_core.core_name + ".csv"
+        file_path = self.partition_dir + table_name + "_" + partition_core.core_name + "_representation.csv"
         # read in corresponding csv
         return self.load_csv(file_path)
 
     def get_partition_group(self, table_name, partition_core, group_id):
-        file_path = self.partition_dir + table_name + '_group' +\
-            str(group_id) + "_" + partition_core.core_name + '.csv'
+        file_path = self.partition_dir + table_name + "_" + partition_core.core_name + '_group' + str(group_id) + '.csv'
         return self.load_csv(file_path)
 
+    def store_output(self, df, table_name, query_name, partition_core=None, is_direct_mode=False):
+        if df is None:
+            return
+        if is_direct_mode:
+            mode = '_D'
+            partition_choose = "_"
+        else:
+            mode = '_SR'
+            partition_choose = "_" + partition_core.core_name
+        file_path = self.output_dir + table_name + partition_choose + "_" + query_name + mode + '.csv'
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+
+        df.to_csv(file_path, index=False)
 
     # TODO a helper function which can help us generate the name of partition file
 
