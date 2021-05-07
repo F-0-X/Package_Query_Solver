@@ -1,6 +1,6 @@
 .idea/
 venv/
-src/__pycache__/
+*/__pycache__/
 try/
 data/tpch.csv
 output/*.png
