@@ -10,9 +10,10 @@ import numpy as np
 
 class SketchRefine:
 
-    def __init__(self):
+    def __init__(self, use_cplex):
         # updated by sketch and used by refine
         self.P = None
+        self.use_cplex = use_cplex
 
     def sketch(self, query, rep_df):
         #  we firstly build a representation table, where each tuple represent a groups
@@ -69,7 +70,7 @@ class SketchRefine:
             +---------------+--------+
         
         """
-        ps = direct(query=query, dataframe=R, is_sketch=True)
+        ps = direct(query=query, dataframe=R, is_sketch=True, usecplex=self.use_cplex)
 
 
 
@@ -138,7 +139,7 @@ class SketchRefine:
             if curr_group.get_num_of_tuple == 0:
                 continue
             Q1, Q2 = Q(curr_group, ps)
-            pi = direct(Q1, Q2, num_tuple=True)
+            pi = direct(Q1, Q2, num_tuple=True, usecplex=self.use_cplex)
 
             append_col = [True] * pi.shape[0]
             pi['refined'] = append_col

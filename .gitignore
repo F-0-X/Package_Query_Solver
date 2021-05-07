@@ -6,3 +6,6 @@ data/tpch.csv
 output/*.png
 output/*.txt
 output/*.csv
+*.log
+secret.py
+__pycache__/
