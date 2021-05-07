@@ -3,9 +3,10 @@ import pulp
 import pandas as pd
 import numpy as np
 import timeit
+import secret
 
 
-def direct(query, dataframe, is_sketch=False, num_tuple=False):
+def direct(query, dataframe, is_sketch=False, num_tuple=False, usecplex=False):
     # table_name = query["table"]
     # path_to_dataset = data_dir + table_name + '.csv'
     #
@@ -13,6 +14,10 @@ def direct(query, dataframe, is_sketch=False, num_tuple=False):
     #     # TODO maybe we can choose to return empty query result
     #     raise Exception("can't find the table in the query")
     Table = dataframe
+    if usecplex:
+
+        path_to_cplex = secret.path_to_cplex
+        solver = pulp.CPLEX_CMD(path=path_to_cplex)
     print(query)
     print(Table)
     # defind min or max problem
@@ -89,8 +94,11 @@ def direct(query, dataframe, is_sketch=False, num_tuple=False):
             var = np.array(var)
             prob += pulp.lpSum(var) <= groupsize
 
+    if usecplex:
+        prob.solve(solver)
+    else:
+        prob.solve()
 
-    prob.solve()
     print("Status:", pulp.LpStatus[prob.status])
     # for v in prob.variables():
     #     print(v.name, "=", v.varValue)
