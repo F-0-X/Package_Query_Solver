@@ -1,17 +1,19 @@
 import argparse
 import timeit
-from Direct import *
+from src.Direct import *
 from src.SketchRefine import SketchRefine
 from src.utils import *
-from partition import *
+from src.partition import *
 import os
 
 
-def main(args):
+def main(args, query=None):
     print(args)
-    # TODO parse the args into variables
-    path_to_input_file = os.path.join(args.input_dir, args.input_file)
-    query = processInputFile(path_to_input_file)
+
+    if query is None:
+        path_to_input_file = os.path.join(args.input_dir, args.input_file)
+        query = processInputFile(path_to_input_file)
+
     load_write_helper = LoadAndWrite(args)
     query_name = os.path.splitext(args.input_file)[0]
 
@@ -33,10 +35,12 @@ def main(args):
         load_write_helper.store_output(sketch_result_df, query['table'], query_name, partition_core=partition_core)
     else:
         print('Direct Mode')
+        start = timeit.default_timer()
         df = load_write_helper.load_initial_table(query['table'])
         direct_df = direct(query, df, usecplex=args.use_cplex)
+        stop = timeit.default_timer()
         load_write_helper.store_output(direct_df, query['table'], query_name, is_direct_mode=True)
-        a = 1
+    return stop - start
 
 if __name__ == '__main__':
 
@@ -55,7 +59,7 @@ if __name__ == '__main__':
     # argument for default read in data file address
     parser.add_argument("--input_dir", default="./input/", type=str, help="folder for input json file")
     # argument for default input(json file) address
-    parser.add_argument("--input_file", default="Q1.json", type=str, help="input file name")
+    parser.add_argument("--input_file", default="Q2.json", type=str, help="input file name")
 
     parser.add_argument("--output_dir", default="output/", type=str, help="result folder")
 
