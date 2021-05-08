@@ -29,17 +29,20 @@ def main(args, query=None):
 
         worker = SketchRefine(args.use_cplex)
         start = timeit.default_timer()
-        sketch_result_df = worker.sketch_and_refine(query, load_write_helper, partition_core)
+        result_df = worker.sketch_and_refine(query, load_write_helper, partition_core)
         stop = timeit.default_timer()
         print("sketch refine time taken for " + query_name + " : " + str(stop - start))
-        load_write_helper.store_output(sketch_result_df, query['table'], query_name, partition_core=partition_core)
+        load_write_helper.store_output(result_df, query['table'], query_name, partition_core=partition_core)
     else:
         print('Direct Mode')
         start = timeit.default_timer()
         df = load_write_helper.load_initial_table(query['table'])
-        direct_df = direct(query, df, usecplex=args.use_cplex)
+        result_df = direct(query, df, usecplex=args.use_cplex)
         stop = timeit.default_timer()
-        load_write_helper.store_output(direct_df, query['table'], query_name, is_direct_mode=True)
+        load_write_helper.store_output(result_df, query['table'], query_name, is_direct_mode=True)
+
+    if result_df is None:
+        return -1
     return stop - start
 
 if __name__ == '__main__':

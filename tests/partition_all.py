@@ -17,22 +17,31 @@ def partition_one(num_of_groups, table_name, load_write_helper, extension):
 
 
 def partition_all(args):
-    cores = multiprocessing.cpu_count()
-    pool = multiprocessing.Pool(processes=cores - 10)
-    load_write_helper = LoadAndWrite(args)
 
+    partition_fig7(args)
+    partition_fig8(args)
+
+
+def partition_fig7(args):
     table_options = ['tpch_10.0%_rand', 'tpch_20.0%_rand', 'tpch_30.0%_rand', 'tpch_40.0%_rand', 'tpch_50.0%_rand',
                      'tpch_60.0%_rand', 'tpch_70.0%_rand', 'tpch_80.0%_rand', 'tpch_90.0%_rand', 'tpch']
-    group_num_options = [800, 1200, 1600]
+    table_options.reverse()
+    extension_options = [True, False]
+    for t in table_options:
+        for e in extension_options:
+            partition_one(600, t, LoadAndWrite(args), e)
+        print("fig7" + t + " Done")
+
+
+def partition_fig8(args):
+
+    group_num_options = [200, 600, 800]
     extension_options = [True, False]
 
     tasks = []
-    for t in table_options:
-        for gn in group_num_options:
-            for e in extension_options:
-                partition_one((gn, t, LoadAndWrite(args), e))
-
-
+    for gn in group_num_options:
+        for e in extension_options:
+            partition_one(gn, 'tpch_50.0%_rand', LoadAndWrite(args), e)
 
 
 if __name__ == '__main__':
