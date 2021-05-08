@@ -87,9 +87,6 @@ def fig7_data(args):
 
 
 def fig8_data(args):
-
-
-
     args.advance = True
     group_options = [200, 400, 600, 800]
 
@@ -102,31 +99,49 @@ def fig8_data(args):
 
         dataset_file = 'tpch_50.0%_rand'
         querybase['table'] = dataset_file
+        k_time_list = []
+        g_time_list = []
         for ng in group_options:
             args.num_groups = ng
             args.extension = False
-            k_time = run_query(args, querybase, i, ng)
+            k_time = run_query(args, querybase, i, ng, write_file=False)
             args.extension = True
-            g_time = run_query(args, querybase, i, ng)
+            g_time = run_query(args, querybase, i, ng, write_file=False)
+            k_time_list.append(k_time)
+            g_time_list.append(g_time)
+
+        file_name_k = "output/fig8_Q" + str(i) + "_Kmeans.txt"
+        file_name_g = "output/fig8_Q" + str(i) + "_Gaussian.txt"
+
+        with open(file_name_k, 'a') as f:
+            for time_taken in k_time_list:
+                f.write("%s\n" % str(time_taken))
+
+        with open(file_name_g, 'a') as f:
+            for time_taken in g_time_list:
+                f.write("%s\n" % str(time_taken))
 
 
-def run_query(args, query, Q_id, num_of_group):
+
+
+def run_query(args, query, Q_id, num_of_group, write_file=True):
     time_taken = main(args, query)
-    if args.extension:
-        partition_core = '_Gaussian'
-    else:
-        partition_core = '_Kmeans'
+    if write_file:
+        if args.extension:
+            partition_core = '_Gaussian'
+        else:
+            partition_core = '_Kmeans'
 
-    if args.advance:
-        mode = 'SketchRefine'
-    else:
-        mode = 'Direct'
-        partition_core = ''
+        if args.advance:
+            mode = 'SketchRefine'
+        else:
+            mode = 'Direct'
+            partition_core = ''
 
-    file_name = 'output/' + 'Time_' + mode + partition_core +\
-                str(num_of_group) + '_Q' + str(Q_id) + '.txt'
-    with open(file_name, 'a') as f:
-        f.write("%s\n" % str(time_taken))
+        file_name = 'output/' + 'Time_' + mode + partition_core +\
+                    str(num_of_group) + '_Q' + str(Q_id) + '.txt'
+        with open(file_name, 'a') as f:
+            f.write("%s\n" % str(time_taken))
     return time_taken
 
 
@@ -159,6 +174,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     # We keep using cplex in this evaluation
     args.use_cplex = True
-    fig7_data(args)
+    # fig7_data(args)
     fig8_data(args)
-    run_direct(args)
+    # run_direct(args)

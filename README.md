@@ -12,15 +12,6 @@
 
 [Queries and info](http://avid.cs.umass.edu/courses/645/s2021/project/paql_data/README.txt)
 
-## Instruction
-1. Download the tpch.csv and put it in the data/ folder
-2. remember to set the working directory to 645_project instead of 645_project/src
-3. remember to edit the template for unittest and set the working directory to 645_project
-
-cd 645_project
-export PYTHONPATH=$PWD
-
-
 
 #### Report result reproduce
 
