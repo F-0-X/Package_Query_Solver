@@ -46,9 +46,9 @@ def run_more(args):
     args.use_cplex = True
 
     # Sketch Refine
-    args.advance = True
+    args.advance = False
     # use which kind of partition core
-    # args.extension = False
+    args.extension = True
     run_more_helper(args)
 
 
