@@ -22,7 +22,7 @@
     $ cd 645_project
     $ export PYTHONPATH=$PWD
     ```
-
+   If you are using Windows, you can set the working directory in pycharm.
 3. Install all the dependency, following is our result for "pip list -V" in our virtual enviorment
     
    Package         Version

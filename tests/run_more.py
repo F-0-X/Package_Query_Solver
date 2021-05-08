@@ -176,4 +176,4 @@ if __name__ == '__main__':
     args.use_cplex = True
     fig7_data(args)
     fig8_data(args)
-    # run_direct(args)
+    run_direct(args)
