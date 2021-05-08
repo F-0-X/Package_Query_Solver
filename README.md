@@ -106,6 +106,7 @@
    - Thirdly, print the figures
 
      ```bash
-     # why write something here
+     $ cd 645_project
+     $ python3 tests/produce_plot.py
      ```
 
