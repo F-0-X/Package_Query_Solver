@@ -174,6 +174,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     # We keep using cplex in this evaluation
     args.use_cplex = True
-    # fig7_data(args)
+    fig7_data(args)
     fig8_data(args)
     # run_direct(args)
