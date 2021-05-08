@@ -1,3 +1,7 @@
 !.gitignore
 !README.md
+!direct_vs_sketchRefine_Gaussian600.png
+!direct_vs_sketchRefine_Kmeans600.png
+!partition_size_Gaussian.png
+!partition_size_Kmeans.png
 *

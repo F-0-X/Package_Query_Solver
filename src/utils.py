@@ -57,26 +57,6 @@ def splitDataset(size=[0.1, 0.4, 0.7], path_to_input_file='data/tpch.csv', rando
         # convert to csv
         dataset_part.to_csv(file_path_name, index=False)
 
-def plotDirectVsSketchRefine(dataset_size, direct_time_taken, sketchRefine_time_taken, query_name, x_label, y_label):
-    plt.plot(dataset_size, direct_time_taken)
-    plt.plot(dataset_size, sketchRefine_time_taken)
-    plt.title(query_name)
-    plt.xlabel('Dataset size')
-    plt.ylabel('Time')
-    plt.legend(['Direct', 'SketchRefine'])
-    plt.savefig('output/direct_vs_sketchRefine.png')
-    # plt.show()
-
-def plotDirect(dataset_size, direct_time_taken, query_name, x_label, y_label):
-    dataset_size = [x / 10 for x in range(1, 11)]
-    plt.plot(dataset_size, direct_time_taken)
-    plt.title(query_name)
-    plt.xlabel('Dataset size')
-    plt.ylabel('Time')
-    plt.legend(['Direct'])
-    plt.savefig('output/direct_' + query_name + '.png')
-
-
 
 class OptimizeObjective(Enum):
     MAXIMIZE = 1
