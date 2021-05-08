@@ -1,5 +1,5 @@
 {
-   "table":"tpch_10.0%",
+   "table":"tpch",
    "max": true,
    "A0": "count_order",
    "Lc": "1",

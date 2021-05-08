@@ -54,12 +54,12 @@ if __name__ == '__main__':
     parser.add_argument("-e", "--extension", action="store_true", default=False,
                         help="use GaussianParitionCore (default partition core is KmeansPartitionCore)")
 
-    parser.add_argument("--num_groups", default=400, type=int, help="number of groups in SketchRefine")
+    parser.add_argument("--num_groups", default=800, type=int, help="number of groups in SketchRefine")
 
     # argument for default read in data file address
     parser.add_argument("--input_dir", default="./input/", type=str, help="folder for input json file")
     # argument for default input(json file) address
-    parser.add_argument("--input_file", default="Q2.json", type=str, help="input file name")
+    parser.add_argument("--input_file", default="Q1.json", type=str, help="input file name")
 
     parser.add_argument("--output_dir", default="output/", type=str, help="result folder")
 
