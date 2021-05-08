@@ -48,11 +48,13 @@
    threadpoolctl     2.1.0
    
 4. We use xxx to randomly split the origin dataset. If you want to split the file on your own, you can
-   run 
-
+   run
    ```bash
-   I'm some bash code
+    from src.utils import *
+    splitDataset(size=[0.1,0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], randomSample=True)
    ```
+   The randomSample indicates if you want random sample data from tpch.csv. "size" in splitDataset indicates the 
+   percentage you want to split. In the example, you will get 10% to 100% persent random data.
     in this way, your randomly split dataset might be different from us which can lead to slightly different result
 
     or 
